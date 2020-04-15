@@ -1,0 +1,19 @@
+name: flutter_qa
+description: Flutter Q&amp;A widgets.
+version: 0.0.1
+author:
+homepage: https://github.com/PROGrand/flutter_qa
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  rect_getter: ^0.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:

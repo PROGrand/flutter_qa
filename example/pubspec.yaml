@@ -1,0 +1,32 @@
+name: flutter_qa_example
+description: Demonstrates how to use the flutterqa plugin.
+publish_to: 'none'
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_redux:
+  built_value:
+  built_collection:
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^0.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_qa:
+    path: ../
+
+  build_runner:
+  built_value_generator:
+
+flutter:
+
+  uses-material-design: true
