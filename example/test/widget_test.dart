@@ -13,7 +13,7 @@ import 'package:flutter_qa_example/main.dart';
 void main() {
   testWidgets('Verify Platform version', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(App());
+    await tester.pumpWidget(MyApp());
 
 //    expect(
 //      find.byWidgetPredicate(

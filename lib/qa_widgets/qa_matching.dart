@@ -2,24 +2,31 @@ library flutter_qa;
 
 import 'dart:async';
 
+import 'package:built_collection/built_collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:rect_getter/rect_getter.dart';
 
-typedef MatchingBuilder = Widget Function(
-    BuildContext context, bool query, int index);
-
 class MatchingWidgetBuilder {
-  final int queriesCount;
-  final int answersCount;
-  final MatchingBuilder builder;
+  final int sourcesCount;
+  final int destinationsCount;
+  final BuiltMap<int, int> connections;
+  final Function onClearAll;
+  final Function(int sourceIndex, int destinationIndex) onAddConnection;
+  final Function(int sourceIndex) onRemoveConnection;
+  final Widget Function(BuildContext context, bool query, int index) build;
 
   MatchingWidgetBuilder(
-      {@required this.queriesCount,
-      @required this.answersCount,
-      @required this.builder});
+      {@required this.onClearAll,
+      @required this.onAddConnection,
+      @required this.onRemoveConnection,
+      @required this.sourcesCount,
+      @required this.destinationsCount,
+      @required this.connections,
+      @required this.build});
 }
 
 class MatchingWidget extends StatefulWidget {
@@ -32,7 +39,7 @@ class MatchingWidget extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _MatchingWidgetState(builder);
+    return _MatchingWidgetState();
   }
 
   static _MatchingWidgetState of(BuildContext context) {
@@ -54,9 +61,11 @@ class MatchingWidget extends StatefulWidget {
 
 class _MatchingWidgetState extends State<MatchingWidget> {
   StreamController<_ConnectionLine> controller;
-  final MatchingWidgetBuilder builder;
 
-  _MatchingWidgetState(this.builder);
+  _MatchingWidgetState();
+
+  Map<int, Rect> sourceRects = Map<int, Rect>();
+  Map<int, Rect> destinationRects = Map<int, Rect>();
 
   GlobalKey<_LinesState> _linesKey = new GlobalKey<_LinesState>();
   final _rectKey = RectGetter.createGlobalKey();
@@ -74,27 +83,58 @@ class _MatchingWidgetState extends State<MatchingWidget> {
   }
 
   @override
-  Widget build(BuildContext context) => RectGetter(
-        child: Stack(
-          //overflow: Overflow.clip,
-          children: <Widget>[
-            _Boxes(controller: controller),
-            SizedBox.shrink(
-                child: IgnorePointer(
-              child: _Lines(
-                key: _linesKey,
-                stream: controller.stream,
-              ),
-            )),
-          ],
-        ),
-        key: _rectKey,
-      );
+  Widget build(BuildContext context) {
+    final ret = RectGetter(
+      child: Stack(
+        //overflow: Overflow.clip,
+        children: <Widget>[
+          _Boxes(controller: controller),
+          SizedBox.shrink(
+              child: IgnorePointer(
+            child: _Lines(
+              key: _linesKey,
+              stream: controller.stream,
+            ),
+          )),
+        ],
+      ),
+      key: _rectKey,
+    );
+
+    return ret;
+  }
 
   Map<int, _ConnectionLine> lines() => _linesKey?.currentState?._lines;
 
   void clear() {
+
     controller.add(_ConnectionLineClear());
+
+    if (null != widget.builder.onClearAll) {
+      widget.builder.onClearAll();
+    }
+  }
+
+  void addRect(
+      {@required bool isSource, @required int index, @required Rect rect}) {
+    final rects = isSource ? sourceRects : destinationRects;
+    rects[index] = rect;
+
+    if (sourceRects.length == widget.builder.sourcesCount &&
+        destinationRects.length == widget.builder.destinationsCount) {
+
+      final offset = RectGetter.getRectFromKey(_rectKey).topLeft;
+
+      final list = [
+        for (final connection in widget.builder.connections.entries)
+          _ConnectionLineCreated(
+              sourceRects[connection.key].centerRight - offset,
+              destinationRects[connection.value].centerLeft - offset,
+              connection.key)
+      ];
+
+      controller.add(_ConnectionInitLines(list));
+    }
   }
 }
 
@@ -122,15 +162,15 @@ class _BoxesState extends State<_Boxes> with TickerProviderStateMixin {
       ));
 
   List<Widget> _buildQueries() {
-    final builder = MatchingWidget.of(context).builder;
+    final builder = MatchingWidget.of(context).widget.builder;
     return <Widget>[
-      for (int n = 0; n < builder.queriesCount; n++)
+      for (int n = 0; n < builder.sourcesCount; n++)
         Padding(
             padding: EdgeInsets.all(16),
             child: _QueryWidget(
               index: n,
               controller: widget.controller,
-              child: builder.builder(context, true, n),
+              child: builder.build(context, true, n),
             ))
     ];
   }
@@ -143,14 +183,13 @@ class _BoxesState extends State<_Boxes> with TickerProviderStateMixin {
       ));
 
   List<Widget> _buildAnswers() {
-    final builder = MatchingWidget.of(context).builder;
+    final builder = MatchingWidget.of(context).widget.builder;
     return <Widget>[
-      for (int n = 0; n < builder.answersCount; n++)
+      for (int n = 0; n < builder.destinationsCount; n++)
         Padding(
           padding: EdgeInsets.all(16),
           child: _AnswerWidget(
-              index: n,
-              builder: (context) => builder.builder(context, false, n)),
+              index: n, builder: (context) => builder.build(context, false, n)),
         )
     ];
   }
@@ -184,19 +223,21 @@ class _QueryWidgetState extends State<_QueryWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return RectGetter(
+    final ret = RectGetter(
       key: _rectKey,
       child: _buildGestureDetector(),
     );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final rect = RectGetter.getRectFromKey(_rectKey);
+      MatchingWidget.of(context)
+          .addRect(isSource: true, index: widget._index, rect: rect);
+    });
+
+    return ret;
   }
 
   Widget _buildGestureDetector() {
-//    return GestureDetector(
-//      onPanUpdate: _onPanUpdate,
-//      onPanEnd: _onPanEnd,
-//      child: widget._child,
-//    );
-
     return RawGestureDetector(gestures: <Type, GestureRecognizerFactory>{
       CustomPanGestureRecognizer:
           GestureRecognizerFactoryWithHandlers<CustomPanGestureRecognizer>(
@@ -219,47 +260,58 @@ class _QueryWidgetState extends State<_QueryWidget> {
     Rect rectQuery = RectGetter.getRectFromKey(_rectKey);
     Rect rectWidget =
         RectGetter.getRectFromKey(MatchingWidget.of(context)._rectKey);
-    var line = _ConnectionLineActive();
-    line._start = rectQuery.centerRight - rectWidget.topLeft;
     _lastPosition = position - rectWidget.topLeft;
-    line._end = _lastPosition;
+    var line = _ConnectionLineActive(
+        rectQuery.centerRight - rectWidget.topLeft, _lastPosition);
     widget._controller.add(line);
   }
 
   void _onPanEnd(Offset offset) {
     Rect rectQuery = RectGetter.getRectFromKey(_rectKey);
 
-    Rect rectWidget =
-    RectGetter.getRectFromKey(MatchingWidget.of(context)._rectKey);
+    var matching_widget = MatchingWidget.of(context);
+    Rect rectWidget = RectGetter.getRectFromKey(matching_widget._rectKey);
 
     final HitTestResult result = HitTestResult();
     WidgetsBinding.instance.hitTest(result, _lastPosition + rectWidget.topLeft);
 
     var found = false;
 
+    var sourceIndex = widget._index;
+
     for (HitTestEntry entry in result.path) {
       if (entry.target is RenderMetaData) {
         final RenderMetaData renderMetaData = entry.target;
         if (renderMetaData.metaData is _AnswerWidgetState) {
           var metaData = renderMetaData.metaData as _AnswerWidgetState;
-          final index = metaData.index;
+          final destinationIndex = metaData.index;
 
-          var line = _ConnectionLineCreated();
-          line._index = widget._index;
-          line._start = rectQuery.centerRight - rectWidget.topLeft;
-          Rect rectAnswer = RectGetter.getRectFromKey(metaData.render_key);
-          line._end = rectAnswer.centerLeft - rectWidget.topLeft;
+
+          Rect rectAnswer = RectGetter.getRectFromKey(metaData._rectKey);
+          var line = _ConnectionLineCreated(
+                  rectQuery.centerRight - rectWidget.topLeft,
+                  rectAnswer.centerLeft - rectWidget.topLeft,
+                  sourceIndex);
 
           widget._controller.add(line);
+
+          if (null != matching_widget.widget.builder.onAddConnection) {
+            matching_widget.widget.builder
+                .onAddConnection(sourceIndex, destinationIndex);
+          }
+
           found = true;
+          break;
         }
       }
     }
 
     if (!found) {
-      var line = _ConnectionLineRemoved();
-      line._index = widget._index;
-      widget._controller.add(line);
+      widget._controller.add(_ConnectionLineRemoved(sourceIndex));
+
+      if (null != matching_widget.widget.builder.onRemoveConnection) {
+        matching_widget.widget.builder.onRemoveConnection(sourceIndex);
+      }
     }
   }
 }
@@ -286,17 +338,25 @@ class _AnswerWidget extends StatefulWidget {
 class _AnswerWidgetState extends State<_AnswerWidget> {
   int get index => widget._index;
 
-  GlobalKey render_key = RectGetter.createGlobalKey();
+  final GlobalKey _rectKey = RectGetter.createGlobalKey();
 
   @override
   Widget build(BuildContext context) {
-    return MetaData(
+    final ret = MetaData(
         metaData: this,
         behavior: HitTestBehavior.translucent,
         child: RectGetter(
-          key: render_key,
+          key: _rectKey,
           child: widget._builder(context),
         ));
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final rect = RectGetter.getRectFromKey(_rectKey);
+      MatchingWidget.of(context)
+          .addRect(isSource: false, index: widget._index, rect: rect);
+    });
+
+    return ret;
   }
 }
 
@@ -324,6 +384,10 @@ class _LinesState extends State<_Lines> {
           if (snapshot.data is _ConnectionLineCreated) {
             final line = snapshot.data as _ConnectionLineCreated;
             _lines[line._index] = line;
+          } else if (snapshot.data is _ConnectionInitLines) {
+            for (final line in (snapshot.data as _ConnectionInitLines)._lines) {
+              _lines[line._index] = line;
+            }
           } else if (snapshot.data is _ConnectionLineRemoved) {
             _lines.remove((snapshot.data as _ConnectionLineRemoved)._index);
           } else if (snapshot.data is _ConnectionLineClear) {
@@ -346,21 +410,38 @@ class _LinesState extends State<_Lines> {
 }
 
 abstract class _ConnectionLine {
-  Offset _start;
-  Offset _end;
+  final Offset _start;
+  final Offset _end;
+
+  _ConnectionLine(this._start, this._end);
 }
 
-class _ConnectionLineActive extends _ConnectionLine {}
+class _ConnectionLineActive extends _ConnectionLine {
+  _ConnectionLineActive(Offset start, Offset end) : super(start, end);
+}
 
 class _ConnectionLineCreated extends _ConnectionLine {
-  int _index;
+  final int _index;
+
+  _ConnectionLineCreated(Offset start, Offset end, this._index)
+      : super(start, end);
+}
+
+class _ConnectionInitLines extends _ConnectionLine {
+  final Iterable<_ConnectionLineCreated> _lines;
+
+  _ConnectionInitLines(this._lines) : super(null, null);
 }
 
 class _ConnectionLineRemoved extends _ConnectionLine {
-  int _index;
+  final int _index;
+
+  _ConnectionLineRemoved(this._index) : super(null, null);
 }
 
-class _ConnectionLineClear extends _ConnectionLine {}
+class _ConnectionLineClear extends _ConnectionLine {
+  _ConnectionLineClear() : super(null, null);
+}
 
 class LinesPainter extends CustomPainter {
   final Map<int, _ConnectionLine> _lines;

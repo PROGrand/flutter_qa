@@ -1,58 +1,57 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_qa_example/redux/reducers.dart';
+import 'package:flutter_qa_example/redux/states.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
 
-import 'MatchingPage.dart';
+import 'main_page.dart';
+import 'matching_page.dart';
 
 main() {
-  runApp(MaterialApp(
-    home: DefaultTabController(
-      length: pages.length,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Tabbed AppBar'),
-          bottom: TabBar(
-            isScrollable: true,
-            tabs: pages.map((Page page) {
-              return Tab(
-                text: page.title,
-              );
-            }).toList(),
-          ),
-        ),
-        body: TabBarView(
-          children: pages.map((Page page) {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: page.builder(),
-            );
-          }).toList(),
-        ),
-      ),
-    ),
-  ));
+  final Store<AppState> store = Store(
+    appReducer,
+    initialState: AppState((b) => b
+      ..matchingStates = ListBuilder<MatchingState>(<MatchingState>[
+        MatchingState((b) => b
+          ..title = 'Question 1'
+          ..sources =
+              ListBuilder<String>(<String>['Query 1', 'Query 2', 'Query 3'])
+          ..destinations = ListBuilder<String>(
+              <String>['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'])
+          ..connections = MapBuilder<int, int>(<int, int>{0: 0, 1: 1, 2: 2})),
+        MatchingState((b) => b
+          ..title = 'Test 2'
+          ..sources =
+              ListBuilder<String>(<String>['Query I', 'Query II', 'Query III'])
+          ..destinations = ListBuilder<String>(
+              <String>['Answer I', 'Answer II', 'Answer III', 'Answer IV'])),
+        MatchingState((b) => b
+          ..title = 'Test 3'
+          ..sources =
+              ListBuilder<String>(<String>['Query A', 'Query B', 'Query C'])
+          ..destinations = ListBuilder<String>(
+              <String>['Answer A', 'Answer B', 'Answer C', 'Answer D']))
+      ])),
+    distinct: true,
+    middleware: [],
+  );
+
+  runApp(StoreProvider<AppState>(
+      store: store,
+      child: MaterialApp(
+        home: MainPage(),
+      )));
 }
 
-typedef QABuilder = Widget Function();
-
-class Page {
-  String title;
-  QABuilder builder;
-
-  Page(this.title, this.builder);
-}
-
-List<Page> pages = <Page>[
-  Page("Matching 1", () => MatchingPage()),
-  Page("Matching 2", () => MatchingPage())
-];
-
-class App extends StatefulWidget {
+class MyApp extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return AppState();
+    return MyAppState();
   }
 }
 
-class AppState extends State<App> with TickerProviderStateMixin {
+class MyAppState extends State<MyApp> with TickerProviderStateMixin {
   TabController controller;
 
   @override
@@ -72,14 +71,14 @@ class AppState extends State<App> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     // TODO: implement build
     return SafeArea(
-            child: Scaffold(
-              appBar: TabBar(
-                      tabs: <Widget>[Text('Matching'), Text('Order')],
-                      controller: controller),
-              body: TabBarView(
-                children: <Widget>[MatchingPage(), MatchingPage()],
-              ),
-            ));
+        child: Scaffold(
+      appBar: TabBar(
+          tabs: <Widget>[Text('Matching'), Text('Order')],
+          controller: controller),
+      body: TabBarView(
+        children: <Widget>[MatchingPage(), MatchingPage()],
+      ),
+    ));
   }
 }
 

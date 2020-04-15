@@ -4,10 +4,11 @@ import 'actions.dart';
 
 MatchingState matchReducer(MatchingState state, dynamic action) {
   if (action is AddConnection) {
-    return state
-        .rebuild((b) => b..connections[action.queryIndex] = action.answerIndex);
+
+    return state.rebuild(
+        (b) => b..connections[action.sourceIndex] = action.destinationIndex);
   } else if (action is RemoveConnection) {
-    return state.rebuild((b) => b..connections.remove(action.queryIndex));
+    return state.rebuild((b) => b..connections.remove(action.sourceIndex));
   } else if (action is RemoveAllConnections) {
     return state.rebuild((b) => b..connections.clear());
   } else {
@@ -18,10 +19,13 @@ MatchingState matchReducer(MatchingState state, dynamic action) {
 AppState appReducer(AppState state, dynamic action) {
   if (action is MatchingInplaceAction) {
     return state.rebuild((b) {
+      b.matchingStates.clear();
+
       for (int n = 0; n < state.matchingStates.length; n++) {
         final index = action.matchingIndex;
         final m = state.matchingStates[n];
-        b..matchingStates.add(n == index ? matchReducer(m, action) : m);
+
+        b.matchingStates.add(n == index ? matchReducer(m, action) : m);
       }
     });
   } else {
