@@ -14,6 +14,7 @@ install:
   - ./flutter/bin/flutter doctor -v
   - gem install coveralls-lcov
 before_script:
+  - ./flutter/bin/flutter pub get
   - ./flutter/bin/flutter pub run build_runner build
   - cd example
   - ../flutter/bin/flutter pub run build_runner build
