@@ -39,9 +39,9 @@ jobs:
       script:
         - ../flutter/bin/flutter -v build apk
         - ../flutter/bin/flutter test --coverage
-        - sed -i 's/SF:lib\\/SF:example\\lib\\/' example/coverage/lcov.info
-        - sed -i 's/SF:lib\/SF:example\/lib\//' example/coverage/lcov.info
         - cd ..
+        - sed -i 's/SF:lib\\/SF:example\\lib\\/' example/coverage/lcov.info
+        - sed -i 's/SF:lib\//SF:example\/lib\//' example/coverage/lcov.info
         - ./flutter/bin/flutter test --coverage
         - lcov -a example/coverage/lcov.info -a coverage/lcov.info -o total.info
       after_success:
