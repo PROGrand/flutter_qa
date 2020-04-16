@@ -6,9 +6,19 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 import 'main_page.dart';
-import 'matching_page.dart';
 
 main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return MyAppState();
+  }
+}
+
+class MyAppState extends State<MyApp> {
   final Store<AppState> store = Store(
     appReducer,
     initialState: AppState((b) => b
@@ -37,49 +47,12 @@ main() {
     middleware: [],
   );
 
-  runApp(StoreProvider<AppState>(
+  @override
+  Widget build(BuildContext context) => StoreProvider<AppState>(
       store: store,
       child: MaterialApp(
         home: MainPage(),
-      )));
-}
-
-class MyApp extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return MyAppState();
-  }
-}
-
-class MyAppState extends State<MyApp> with TickerProviderStateMixin {
-  TabController controller;
-
-  @override
-  void initState() {
-    super.initState();
-
-    controller = TabController(vsync: this, length: 2);
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return SafeArea(
-        child: Scaffold(
-      appBar: TabBar(
-          tabs: <Widget>[Text('Matching'), Text('Order')],
-          controller: controller),
-      body: TabBarView(
-        children: <Widget>[MatchingPage(), MatchingPage()],
-      ),
-    ));
-  }
+      ));
 }
 
 //////////////////////////////////////////

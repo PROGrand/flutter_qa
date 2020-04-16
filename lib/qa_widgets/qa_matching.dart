@@ -135,7 +135,7 @@ class _MatchingWidgetState extends State<MatchingWidget> {
   }
 
   _initLines() async {
-    print('INIT LINES: ${widget.builder.connections.entries.length}');
+    //print('INIT LINES: ${widget.builder.connections.entries.length}');
 
     final offset = RectGetter.getRectFromKey(_rectKey).topLeft;
 
