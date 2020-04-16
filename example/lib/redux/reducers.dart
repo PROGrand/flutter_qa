@@ -4,7 +4,6 @@ import 'actions.dart';
 
 MatchingState matchReducer(MatchingState state, dynamic action) {
   if (action is AddConnection) {
-
     return state.rebuild(
         (b) => b..connections[action.sourceIndex] = action.destinationIndex);
   } else if (action is RemoveConnection) {

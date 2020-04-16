@@ -1,7 +1,6 @@
 name: flutter_qa
-description: Flutter Q&amp;A widgets.
-version: 0.0.1
-author:
+description: Flutter Q&A widgets. Collection of widgets used for query-and-answer wizards like exams, quizes and etc.
+version: 0.1.0+1
 homepage: https://github.com/PROGrand/flutter_qa
 
 environment:
@@ -11,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   rect_getter: ^0.1.0
-  built_collection:
+  built_collection: ^4.3.2
 
 dev_dependencies:
   flutter_test:

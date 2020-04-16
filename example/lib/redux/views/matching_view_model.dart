@@ -4,6 +4,12 @@ import '../actions.dart';
 import '../states.dart';
 
 class MatchingViewModel {
+  MatchingViewModel(
+      {this.matching,
+      this.addConnection,
+      this.removeConnection,
+      this.clearAll});
+
   final MatchingState matching;
 
   final Function(int source, int destination) addConnection;
@@ -11,12 +17,6 @@ class MatchingViewModel {
   final Function(int source) removeConnection;
 
   final Function clearAll;
-
-  MatchingViewModel(
-      {this.matching,
-      this.addConnection,
-      this.removeConnection,
-      this.clearAll});
 
   @override
   bool operator ==(Object other) {

@@ -5,6 +5,8 @@ import 'package:built_value/built_value.dart';
 import 'page_builder.dart';
 
 class Page {
+  Page(this.title, this.builder);
+
   final String title;
 
   final QABuilder builder;
@@ -25,6 +27,4 @@ class Page {
     return (newBuiltValueToStringHelper('Page')..add('title', title))
         .toString();
   }
-
-  Page(this.title, this.builder);
 }

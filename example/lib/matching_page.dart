@@ -5,9 +5,9 @@ import 'package:flutter_qa_example/redux/views/matching_view_model.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 class MatchingPage extends StatefulWidget {
-  final int matchingIndex;
-
   MatchingPage({Key key, this.matchingIndex}) : super(key: key);
+
+  final int matchingIndex;
 
   @override
   State<MatchingPage> createState() {

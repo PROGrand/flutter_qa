@@ -7,7 +7,7 @@ import 'package:redux/redux.dart';
 
 import 'main_page.dart';
 
-main() {
+void main() {
   runApp(MyApp());
 }
 

@@ -5,16 +5,16 @@ import 'package:flutter_qa_example/redux/states.dart';
 import 'package:redux/redux.dart';
 
 class PagesViewModel {
-  BuiltList<Page> pages;
-
   PagesViewModel(this.pages);
+
+  BuiltList<Page> pages;
 
   static PagesViewModel fromStore(Store<AppState> store) {
     int matchingIndex = 0;
 
     final pages = ListBuilder<Page>(<Page>[
       for (final item in store.state.matchingStates)
-        Page((item as MatchingState).title,
+        Page(item.title,
             (context) => MatchingPage(matchingIndex: matchingIndex++))
     ]).build();
 

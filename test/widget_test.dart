@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets('Verify Platform version', (WidgetTester tester) async {
-
     await tester.pumpWidget(MatchingTestApp());
 
     expect(find.text('Query 2'), findsOneWidget);
@@ -20,18 +19,16 @@ class MatchingTestApp extends StatefulWidget {
 }
 
 class MatchingTestAppState extends State<MatchingTestApp> {
-
   @override
   Widget build(BuildContext context) => MaterialApp(
-            home: MatchingTestPage(),
-          );
+        home: MatchingTestPage(),
+      );
 }
 
-
 class MatchingTestPage extends StatefulWidget {
-  final int matchingIndex;
-
   MatchingTestPage({Key key, this.matchingIndex}) : super(key: key);
+
+  final int matchingIndex;
 
   @override
   State<MatchingTestPage> createState() {
@@ -64,7 +61,8 @@ class MatchingTestPageState extends State<MatchingTestPage> {
                 destinationsCount: 4,
                 build: (BuildContext context, bool query, int index) =>
                     (query ? _query(index) : _answer(index)),
-                connections: MapBuilder<int,int>(<int, int>{0: 1, 1: 2, 2: 0}).build()),
+                connections:
+                    MapBuilder<int, int>(<int, int>{0: 1, 1: 2, 2: 0}).build()),
           ),
         ),
         Padding(
@@ -110,5 +108,3 @@ Container _answer(int index) {
     ),
   );
 }
-
-

@@ -1,0 +1,12 @@
+dartdoc:
+  include:
+    - flutter_qa
+  ignore:
+    - ambiguous-doc-reference
+    - ambiguous-reexport
+    - broken-link
+    - category-order-gives-missing-package-name
+    - missing-from-search-index
+    - no-canonical-found
+    - unresolved-doc-reference
+    - unresolved-export
