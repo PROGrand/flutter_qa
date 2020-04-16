@@ -1,4 +1,4 @@
-matrix:
+jobs:
   include:
     - language: android
       sudo: false
@@ -8,7 +8,6 @@ matrix:
           - $HOME/.pub-cache
       os:
         - linux
-      sudo: false
       addons:
         apt:
           # Flutter depends on /usr/lib/x86_64-linux-gnu/libstdc++.so.6 version GLIBCXX_3.4.18
@@ -38,8 +37,5 @@ matrix:
       script:
         - ../flutter/bin/flutter -v build apk
         - ../flutter/bin/flutter test --coverage
-      after\_success:
+      after_success:
         - coveralls-lcov coverage/lcov.info
-      cache:
-        directories:
-          - $HOME/.pub-cache
