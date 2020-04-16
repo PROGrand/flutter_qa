@@ -46,4 +46,3 @@ jobs:
         - lcov -a example/coverage/lcov.info -a coverage/lcov.info -o total.info
       after_success:
         - coveralls-lcov total.info
-        
