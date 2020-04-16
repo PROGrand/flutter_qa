@@ -1,6 +1,5 @@
-.DS_Store
-
 # Miscellaneous
+coverage.json
 pubspec.lock
 *.g.dart
 *.class
