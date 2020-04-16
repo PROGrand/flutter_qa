@@ -8,12 +8,20 @@ addons:
       - ubuntu-toolchain-r-test # if we don't specify this, the libstdc++6 we get is the wrong version
     packages:
       - libstdc++6
-      - fonts-droid
+      - fonts-droid-fallback
+install:
+  - git clone https://github.com/flutter/flutter.git -b stable --depth 1
+  - ./flutter/bin/flutter doctor -v
+  - gem install coveralls-lcov
 before_script:
-  - git clone https://github.com/flutter/flutter.git -b stable
-  - ./flutter/bin/flutter doctor
+  - ./flutter/bin/flutter pub get
+  - cd example
+  - ../flutter/bin/flutter pub run build_runner build
 script:
-  - ./flutter/bin/flutter test
+  - ../flutter/bin/flutter -v build apk
+  - ../flutter/bin/flutter test --coverage
+after\_success:
+  - coveralls-lcov coverage/lcov.info
 cache:
   directories:
     - $HOME/.pub-cache
