@@ -4,23 +4,20 @@ import 'package:built_value/built_value.dart';
 
 import 'page_builder.dart';
 
-part 'qa_page.g.dart';
+class Page {
+  final String title;
 
-abstract class Page implements Built<Page, PageBuilder> {
-  String get title;
-
-  QABuilder get builder;
+  final QABuilder builder;
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    final dynamic _$dynamicOther = other;
     return other is Page && title == other.title;
   }
 
   @override
   int get hashCode {
-    return $jf($jc(0, title.hashCode));
+    return title.hashCode;
   }
 
   @override
@@ -29,7 +26,5 @@ abstract class Page implements Built<Page, PageBuilder> {
         .toString();
   }
 
-  Page._();
-
-  factory Page([void Function(PageBuilder) updates]) = _$Page;
+  Page(this.title, this.builder);
 }
