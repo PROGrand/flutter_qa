@@ -26,6 +26,7 @@ jobs:
         - echo y | sdkmanager "extras;android;m2repository" >/dev/null
         - echo y | sdkmanager "extras;google;m2repository" >/dev/null
         - sdkmanager --list
+        - cd ..
       install:
         - git clone https://github.com/flutter/flutter.git -b stable --depth 1
         - ./flutter/bin/flutter doctor -v
