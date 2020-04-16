@@ -5,7 +5,6 @@ import 'dart:async';
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:rect_getter/rect_getter.dart';
@@ -18,15 +17,21 @@ class MatchingWidgetBuilder {
   final Function(int sourceIndex, int destinationIndex) onAddConnection;
   final Function(int sourceIndex) onRemoveConnection;
   final Widget Function(BuildContext context, bool query, int index) build;
+  final Color activeColor;
+  final Color connectedColor;
 
   MatchingWidgetBuilder(
-      {@required this.onClearAll,
+      {Color activeColor,
+      Color connectedColor,
+      @required this.onClearAll,
       @required this.onAddConnection,
       @required this.onRemoveConnection,
       @required this.sourcesCount,
       @required this.destinationsCount,
       @required this.connections,
-      @required this.build});
+      @required this.build})
+      : this.activeColor = activeColor ?? Color.fromARGB(255, 255, 0, 0),
+        this.connectedColor = connectedColor ?? Color.fromARGB(255, 0, 0, 255);
 }
 
 class MatchingWidget extends StatefulWidget {
@@ -64,10 +69,9 @@ class _MatchingWidgetState extends State<MatchingWidget> {
 
   _MatchingWidgetState();
 
-  Map<int, Rect> sourceRects = Map<int, Rect>();
-  Map<int, Rect> destinationRects = Map<int, Rect>();
-
-  GlobalKey<_LinesState> _linesKey = new GlobalKey<_LinesState>();
+  final sourceRects = Map<int, Rect>();
+  final destinationRects = Map<int, Rect>();
+  final _linesKey = new GlobalKey<_LinesState>();
   final _rectKey = RectGetter.createGlobalKey();
 
   @override
@@ -84,6 +88,9 @@ class _MatchingWidgetState extends State<MatchingWidget> {
 
   @override
   Widget build(BuildContext context) {
+    sourceRects.clear();
+    destinationRects.clear();
+
     final ret = RectGetter(
       child: Stack(
         //overflow: Overflow.clip,
@@ -94,6 +101,8 @@ class _MatchingWidgetState extends State<MatchingWidget> {
             child: _Lines(
               key: _linesKey,
               stream: controller.stream,
+              activeColor: widget.builder.activeColor,
+              connectedColor: widget.builder.connectedColor,
             ),
           )),
         ],
@@ -104,10 +113,9 @@ class _MatchingWidgetState extends State<MatchingWidget> {
     return ret;
   }
 
-  Map<int, _ConnectionLine> lines() => _linesKey?.currentState?._lines;
+  get lines => _linesKey?.currentState?._lines;
 
   void clear() {
-
     controller.add(_ConnectionLineClear());
 
     if (null != widget.builder.onClearAll) {
@@ -122,19 +130,24 @@ class _MatchingWidgetState extends State<MatchingWidget> {
 
     if (sourceRects.length == widget.builder.sourcesCount &&
         destinationRects.length == widget.builder.destinationsCount) {
-
-      final offset = RectGetter.getRectFromKey(_rectKey).topLeft;
-
-      final list = [
-        for (final connection in widget.builder.connections.entries)
-          _ConnectionLineCreated(
-              sourceRects[connection.key].centerRight - offset,
-              destinationRects[connection.value].centerLeft - offset,
-              connection.key)
-      ];
-
-      controller.add(_ConnectionInitLines(list));
+      _initLines();
     }
+  }
+
+  _initLines() async {
+    print('INIT LINES: ${widget.builder.connections.entries.length}');
+
+    final offset = RectGetter.getRectFromKey(_rectKey).topLeft;
+
+    final list = [
+      for (final connection in widget.builder.connections.entries)
+        _ConnectionLineCreated(
+            sourceRects[connection.key].centerRight - offset,
+            destinationRects[connection.value].centerLeft - offset,
+            connection.key)
+    ];
+
+    controller.add(_ConnectionInitLines(list));
   }
 }
 
@@ -218,8 +231,8 @@ class _QueryWidget extends StatefulWidget {
 }
 
 class _QueryWidgetState extends State<_QueryWidget> {
-  var _rectKey = RectGetter.createGlobalKey();
-  Offset _lastPosition = Offset(0, 0);
+  final _rectKey = RectGetter.createGlobalKey();
+  var _lastPosition = Offset(0, 0);
 
   @override
   Widget build(BuildContext context) {
@@ -252,32 +265,32 @@ class _QueryWidgetState extends State<_QueryWidget> {
   }
 
   bool _onPanDown(Offset position) {
-    RenderBox renderBox = context.findRenderObject();
-    return renderBox.globalToLocal(position) != null;
+    final renderBox = context.findRenderObject() as RenderBox;
+    assert(null != renderBox);
+    return null != renderBox?.globalToLocal(position);
   }
 
   void _onPanUpdate(Offset position) {
-    Rect rectQuery = RectGetter.getRectFromKey(_rectKey);
-    Rect rectWidget =
+    final rectQuery = RectGetter.getRectFromKey(_rectKey);
+    final rectWidget =
         RectGetter.getRectFromKey(MatchingWidget.of(context)._rectKey);
     _lastPosition = position - rectWidget.topLeft;
-    var line = _ConnectionLineActive(
+    final line = _ConnectionLineActive(
         rectQuery.centerRight - rectWidget.topLeft, _lastPosition);
     widget._controller.add(line);
   }
 
   void _onPanEnd(Offset offset) {
-    Rect rectQuery = RectGetter.getRectFromKey(_rectKey);
+    final rectQuery = RectGetter.getRectFromKey(_rectKey);
+    final matchingWidget = MatchingWidget.of(context);
+    final rectWidget = RectGetter.getRectFromKey(matchingWidget._rectKey);
 
-    var matching_widget = MatchingWidget.of(context);
-    Rect rectWidget = RectGetter.getRectFromKey(matching_widget._rectKey);
-
-    final HitTestResult result = HitTestResult();
+    final result = HitTestResult();
     WidgetsBinding.instance.hitTest(result, _lastPosition + rectWidget.topLeft);
 
     var found = false;
 
-    var sourceIndex = widget._index;
+    final sourceIndex = widget._index;
 
     for (HitTestEntry entry in result.path) {
       if (entry.target is RenderMetaData) {
@@ -286,17 +299,16 @@ class _QueryWidgetState extends State<_QueryWidget> {
           var metaData = renderMetaData.metaData as _AnswerWidgetState;
           final destinationIndex = metaData.index;
 
-
-          Rect rectAnswer = RectGetter.getRectFromKey(metaData._rectKey);
-          var line = _ConnectionLineCreated(
-                  rectQuery.centerRight - rectWidget.topLeft,
-                  rectAnswer.centerLeft - rectWidget.topLeft,
-                  sourceIndex);
+          final rectAnswer = RectGetter.getRectFromKey(metaData._rectKey);
+          final line = _ConnectionLineCreated(
+              rectQuery.centerRight - rectWidget.topLeft,
+              rectAnswer.centerLeft - rectWidget.topLeft,
+              sourceIndex);
 
           widget._controller.add(line);
 
-          if (null != matching_widget.widget.builder.onAddConnection) {
-            matching_widget.widget.builder
+          if (null != matchingWidget.widget.builder.onAddConnection) {
+            matchingWidget.widget.builder
                 .onAddConnection(sourceIndex, destinationIndex);
           }
 
@@ -309,8 +321,8 @@ class _QueryWidgetState extends State<_QueryWidget> {
     if (!found) {
       widget._controller.add(_ConnectionLineRemoved(sourceIndex));
 
-      if (null != matching_widget.widget.builder.onRemoveConnection) {
-        matching_widget.widget.builder.onRemoveConnection(sourceIndex);
+      if (null != matchingWidget.widget.builder.onRemoveConnection) {
+        matchingWidget.widget.builder.onRemoveConnection(sourceIndex);
       }
     }
   }
@@ -336,9 +348,9 @@ class _AnswerWidget extends StatefulWidget {
 }
 
 class _AnswerWidgetState extends State<_AnswerWidget> {
-  int get index => widget._index;
+  get index => widget._index;
 
-  final GlobalKey _rectKey = RectGetter.createGlobalKey();
+  final _rectKey = RectGetter.createGlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -362,8 +374,14 @@ class _AnswerWidgetState extends State<_AnswerWidget> {
 
 class _Lines extends StatefulWidget {
   final Stream<_ConnectionLine> stream;
+  final Color activeColor;
+  final Color connectedColor;
 
-  _Lines({@required GlobalKey<_LinesState> key, @required this.stream})
+  _Lines(
+      {@required GlobalKey<_LinesState> key,
+      @required this.stream,
+      @required this.activeColor,
+      @required this.connectedColor})
       : super(key: key);
 
   @override
@@ -371,7 +389,7 @@ class _Lines extends StatefulWidget {
 }
 
 class _LinesState extends State<_Lines> {
-  Map<int, _ConnectionLine> _lines = Map();
+  final _lines = Map<int, _ConnectionLine>();
 
   @override
   build(_) => StreamBuilder<_ConnectionLine>(
@@ -396,7 +414,8 @@ class _LinesState extends State<_Lines> {
 
           return CustomPaint(
             size: Size.zero,
-            painter: LinesPainter(_lines, activeLink),
+            painter: LinesPainter(
+                _lines, activeLink, widget.activeColor, widget.connectedColor),
           );
         } else
           return Container();
@@ -445,9 +464,12 @@ class _ConnectionLineClear extends _ConnectionLine {
 
 class LinesPainter extends CustomPainter {
   final Map<int, _ConnectionLine> _lines;
-  _ConnectionLine _activeLink;
+  final _ConnectionLine _activeLink;
+  final Color activeColor;
+  final Color connectedColor;
 
-  LinesPainter(this._lines, this._activeLink);
+  LinesPainter(
+      this._lines, this._activeLink, this.activeColor, this.connectedColor);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -456,7 +478,7 @@ class LinesPainter extends CustomPainter {
         _activeLink,
         Paint()
           ..strokeWidth = 4
-          ..color = Colors.redAccent);
+          ..color = activeColor);
 
     for (_ConnectionLine line in _lines.values) {
       _drawLine(
@@ -464,7 +486,7 @@ class LinesPainter extends CustomPainter {
           line,
           Paint()
             ..strokeWidth = 4
-            ..color = Colors.blueAccent);
+            ..color = connectedColor);
     }
   }
 

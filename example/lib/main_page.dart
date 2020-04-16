@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_qa_example/redux/states.dart';
-import 'package:flutter_qa_example/redux/views.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'qa_page.dart';
+import 'redux/views/views.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({

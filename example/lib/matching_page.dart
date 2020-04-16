@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_qa/qa_widgets/qa_matching.dart';
 import 'package:flutter_qa_example/redux/states.dart';
-import 'package:flutter_qa_example/redux/views.dart';
+import 'package:flutter_qa_example/redux/views/matching_view_model.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 class MatchingPage extends StatefulWidget {
@@ -16,7 +16,7 @@ class MatchingPage extends StatefulWidget {
 }
 
 class MatchingPageState extends State<MatchingPage> {
-  final matching_key = MatchingWidget.createGlobalKey();
+  final matchingKey = MatchingWidget.createGlobalKey();
 
   @override
   void initState() {
@@ -28,7 +28,10 @@ class MatchingPageState extends State<MatchingPage> {
     return StoreConnector<AppState, MatchingViewModel>(
         converter: (store) =>
             MatchingViewModel.fromStore(store, widget.matchingIndex),
-        builder: _build);
+        builder: _build,
+        distinct: true,
+        //in this example it is for mark only.
+        rebuildOnChange: false);
   }
 
   Widget _build(BuildContext context, MatchingViewModel vm) {
@@ -36,8 +39,10 @@ class MatchingPageState extends State<MatchingPage> {
       children: <Widget>[
         Expanded(
           child: MatchingWidget(
-            key: matching_key,
+            key: matchingKey,
             builder: MatchingWidgetBuilder(
+                activeColor: Theme.of(context).primaryColor.withOpacity(0.25),
+                connectedColor: Theme.of(context).primaryColor,
                 onAddConnection: vm.addConnection,
                 onRemoveConnection: vm.removeConnection,
                 onClearAll: vm.clearAll,
@@ -53,7 +58,7 @@ class MatchingPageState extends State<MatchingPage> {
             child: RaisedButton(
               child: Text('Clear'),
               onPressed: () {
-                matching_key.currentState.clear();
+                matchingKey.currentState.clear();
               },
             ))
       ],
