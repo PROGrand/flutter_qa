@@ -10,7 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_qa_example/main.dart';
 
 void main() {
-  testWidgets('Verify Platform version', (WidgetTester tester) async {
+  testWidgets('Example test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(MyApp());
 

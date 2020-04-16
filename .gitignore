@@ -1,5 +1,7 @@
 # Miscellaneous
-coverage.json
+total.info
+coverage/
+**/coverage/
 pubspec.lock
 *.g.dart
 *.class
