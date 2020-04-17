@@ -6,3 +6,6 @@ $ dartdoc --no-allow-non-local-warnings --no-auto-include-dependencies
 
 ## build runner
 $ flutter pub run build_runner build
+
+## pub.dev publish
+$ flutter pub publish

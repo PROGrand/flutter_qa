@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_qa/qa_widgets/qa_matching.dart';
 import 'package:flutter_qa_example/redux/states.dart';
 import 'package:flutter_qa_example/redux/views/matching_view_model.dart';
@@ -36,8 +37,10 @@ class MatchingPageState extends State<MatchingPage> {
 
   Widget _build(BuildContext context, MatchingViewModel vm) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Expanded(
+        Flexible(
+          fit: FlexFit.loose,
           child: MatchingWidget(
             key: matchingKey,
             builder: MatchingWidgetBuilder(
