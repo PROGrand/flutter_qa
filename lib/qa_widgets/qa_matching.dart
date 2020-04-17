@@ -111,24 +111,26 @@ class MatchingWidgetState extends State<MatchingWidget> {
     _sourceRects.clear();
     _destinationRects.clear();
 
-    final ret = RectGetter(
-      child: Stack(
-        //overflow: Overflow.clip,
-        children: <Widget>[
-          _Boxes(controller: _controller),
-          SizedBox.shrink(
-              child: IgnorePointer(
-            child: _Lines(
-              key: _linesKey,
-              stream: _controller.stream,
-              activeColor: widget._builder.activeColor,
-              connectedColor: widget._builder.connectedColor,
-            ),
-          )),
-        ],
-      ),
-      key: _rectKey,
-    );
+    final ret = LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) =>
+            RectGetter(
+              child: Stack(
+                //overflow: Overflow.clip,
+                children: <Widget>[
+                  _Boxes(controller: _controller),
+                  SizedBox.shrink(
+                      child: IgnorePointer(
+                    child: _Lines(
+                      key: _linesKey,
+                      stream: _controller.stream,
+                      activeColor: widget._builder.activeColor,
+                      connectedColor: widget._builder.connectedColor,
+                    ),
+                  )),
+                ],
+              ),
+              key: _rectKey,
+            ));
 
     return ret;
   }
@@ -156,7 +158,6 @@ class MatchingWidgetState extends State<MatchingWidget> {
   }
 
   Future<void> _initLines() async {
-
     final offset = RectGetter.getRectFromKey(_rectKey).topLeft;
 
     final list = [
