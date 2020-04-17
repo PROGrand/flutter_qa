@@ -6,7 +6,9 @@ import 'package:flutter_qa_example/redux/views/matching_view_model.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 class MatchingPage extends StatefulWidget {
-  MatchingPage({Key key, this.matchingIndex}) : super(key: key);
+  MatchingPage({Key key, this.matchingIndex}) : super(key: key) {
+    assert(3 > this.matchingIndex);
+  }
 
   final int matchingIndex;
 
@@ -39,31 +41,29 @@ class MatchingPageState extends State<MatchingPage> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Flexible(
-          fit: FlexFit.loose,
-          child: MatchingWidget(
-            key: matchingKey,
-            builder: MatchingWidgetBuilder(
-                activeColor: Theme.of(context).primaryColor.withOpacity(0.25),
-                connectedColor: Theme.of(context).primaryColor,
-                onAddConnection: vm.addConnection,
-                onRemoveConnection: vm.removeConnection,
-                onClearAll: vm.clearAll,
-                sourcesCount: vm.matching.sources.length,
-                destinationsCount: vm.matching.destinations.length,
-                build: (BuildContext context, bool query, int index) =>
-                    (query ? _query(index, vm) : _answer(index, vm)),
-                connections: vm.matching.connections),
-          ),
+        MatchingWidget(
+          key: matchingKey,
+          builder: MatchingWidgetBuilder(
+              activeColor: Theme.of(context).primaryColor.withOpacity(0.25),
+              connectedColor: Theme.of(context).primaryColor,
+              onAddConnection: vm.addConnection,
+              onRemoveConnection: vm.removeConnection,
+              onClearAll: vm.clearAll,
+              sourcesCount: vm.matching.sources.length,
+              destinationsCount: vm.matching.destinations.length,
+              build: (BuildContext context, bool query, int index) =>
+                  (query ? _query(index, vm) : _answer(index, vm)),
+              connections: vm.matching.connections),
         ),
-        Padding(
-            padding: EdgeInsets.only(bottom: 16),
-            child: RaisedButton(
-              child: Text('Clear'),
-              onPressed: () {
-                matchingKey.currentState.clear();
-              },
-            ))
+        RaisedButton(
+          child: Text('Clear'),
+          onPressed: () {
+            matchingKey.currentState.clear();
+          },
+        ),
+        SizedBox(
+          height: 16,
+        )
       ],
     );
   }

@@ -76,18 +76,13 @@ class MatchingWidget extends StatefulWidget {
   /// Allows to get current MatchingWidget in context.
   static MatchingWidgetState of(BuildContext context) {
     assert(context != null);
-    final state = context.findAncestorStateOfType<MatchingWidgetState>();
-    if (state != null) return state;
-    throw FlutterError.fromParts(<DiagnosticsNode>[
-      ErrorSummary(
-          'MatchingWidget.of() called with a context that does not contain a MatchingWidget.'),
-      ErrorDescription(
-          'No MatchingWidget ancestor could be found starting from the context that was passed '
-          'to MatchingWidget.of(). This can happen because you do not have a WidgetsApp or '
-          'MaterialApp widget (those widgets introduce a MatchingWidget), or it can happen '
-          'if the context you use comes from a widget above those widgets.'),
-      context.describeElement('The context used was')
-    ]);
+
+    try {
+      final state = context.findAncestorStateOfType<MatchingWidgetState>();
+      if (state != null) return state;
+    } catch (e, s) {}
+
+    return null;
   }
 }
 
@@ -161,7 +156,6 @@ class MatchingWidgetState extends State<MatchingWidget> {
   }
 
   Future<void> _initLines() async {
-    //print('INIT LINES: ${widget._builder.connections.entries.length}');
 
     final offset = RectGetter.getRectFromKey(_rectKey).topLeft;
 
@@ -201,7 +195,11 @@ class _BoxesState extends State<_Boxes> with TickerProviderStateMixin {
       ));
 
   List<Widget> _buildQueries() {
-    final builder = MatchingWidget.of(context).widget._builder;
+    final matchingState = MatchingWidget.of(context);
+    if (null == matchingState) {
+      return List<Widget>();
+    }
+    final builder = matchingState.widget._builder;
     return <Widget>[
       for (int n = 0; n < builder.sourcesCount; n++)
         Padding(
@@ -222,7 +220,11 @@ class _BoxesState extends State<_Boxes> with TickerProviderStateMixin {
       ));
 
   List<Widget> _buildAnswers() {
-    final builder = MatchingWidget.of(context).widget._builder;
+    final matchingState = MatchingWidget.of(context);
+    if (null == matchingState) {
+      return <Widget>[];
+    }
+    final builder = matchingState.widget._builder;
     return <Widget>[
       for (int n = 0; n < builder.destinationsCount; n++)
         Padding(
@@ -260,6 +262,20 @@ class _QueryWidgetState extends State<_QueryWidget> {
   final _rectKey = RectGetter.createGlobalKey();
   var _lastPosition = Offset(0, 0);
 
+  bool _inited;
+
+  @override
+  void initState() {
+    super.initState();
+    _inited = true;
+  }
+
+  @override
+  void dispose() {
+    _inited = false;
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final ret = RectGetter(
@@ -268,9 +284,11 @@ class _QueryWidgetState extends State<_QueryWidget> {
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final rect = RectGetter.getRectFromKey(_rectKey);
-      MatchingWidget.of(context)
-          ._addRect(isSource: true, index: widget._index, rect: rect);
+      if (_inited) {
+        final rect = RectGetter.getRectFromKey(_rectKey);
+        MatchingWidget.of(context)
+            ?._addRect(isSource: true, index: widget._index, rect: rect);
+      }
     });
 
     return ret;
@@ -297,9 +315,14 @@ class _QueryWidgetState extends State<_QueryWidget> {
   }
 
   void _onPanUpdate(Offset position) {
+    final matchingState = MatchingWidget.of(context);
+    if (null == matchingState) {
+      return;
+    }
+
     final rectQuery = RectGetter.getRectFromKey(_rectKey);
-    final rectWidget =
-        RectGetter.getRectFromKey(MatchingWidget.of(context)._rectKey);
+
+    final rectWidget = RectGetter.getRectFromKey(matchingState._rectKey);
     _lastPosition = position - rectWidget.topLeft;
     final line = _ConnectionLineActive(
         rectQuery.centerRight - rectWidget.topLeft, _lastPosition);
@@ -307,9 +330,12 @@ class _QueryWidgetState extends State<_QueryWidget> {
   }
 
   void _onPanEnd(Offset offset) {
+    final matchingState = MatchingWidget.of(context);
+    if (null == matchingState) {
+      return;
+    }
     final rectQuery = RectGetter.getRectFromKey(_rectKey);
-    final matchingWidget = MatchingWidget.of(context);
-    final rectWidget = RectGetter.getRectFromKey(matchingWidget._rectKey);
+    final rectWidget = RectGetter.getRectFromKey(matchingState._rectKey);
 
     final result = HitTestResult();
     WidgetsBinding.instance.hitTest(result, _lastPosition + rectWidget.topLeft);
@@ -333,8 +359,8 @@ class _QueryWidgetState extends State<_QueryWidget> {
 
           widget._controller.add(line);
 
-          if (null != matchingWidget.widget._builder.onAddConnection) {
-            matchingWidget.widget._builder
+          if (null != matchingState.widget._builder.onAddConnection) {
+            matchingState.widget._builder
                 .onAddConnection(sourceIndex, destinationIndex);
           }
 
@@ -347,8 +373,8 @@ class _QueryWidgetState extends State<_QueryWidget> {
     if (!found) {
       widget._controller.add(_ConnectionLineRemoved(sourceIndex));
 
-      if (null != matchingWidget.widget._builder.onRemoveConnection) {
-        matchingWidget.widget._builder.onRemoveConnection(sourceIndex);
+      if (null != matchingState.widget._builder.onRemoveConnection) {
+        matchingState.widget._builder.onRemoveConnection(sourceIndex);
       }
     }
   }
@@ -378,6 +404,20 @@ class _AnswerWidgetState extends State<_AnswerWidget> {
 
   final _rectKey = RectGetter.createGlobalKey();
 
+  bool _inited;
+
+  @override
+  void initState() {
+    super.initState();
+    _inited = true;
+  }
+
+  @override
+  void dispose() {
+    _inited = false;
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final ret = MetaData(
@@ -389,9 +429,11 @@ class _AnswerWidgetState extends State<_AnswerWidget> {
         ));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final rect = RectGetter.getRectFromKey(_rectKey);
-      MatchingWidget.of(context)
-          ._addRect(isSource: false, index: widget._index, rect: rect);
+      if (_inited) {
+        final rect = RectGetter.getRectFromKey(_rectKey);
+        MatchingWidget.of(context)
+            ?._addRect(isSource: false, index: widget._index, rect: rect);
+      }
     });
 
     return ret;
@@ -418,34 +460,40 @@ class _LinesState extends State<_Lines> {
   final _lines = Map<int, _ConnectionLine>();
 
   @override
-  Widget build(BuildContext context) => StreamBuilder<_ConnectionLine>(
-      stream: widget.stream,
-      builder: (BuildContext context, AsyncSnapshot<_ConnectionLine> snapshot) {
-        if (snapshot.connectionState == ConnectionState.active) {
-          final activeLink =
-              (snapshot.data is _ConnectionLineActive) ? snapshot.data : null;
+  Widget build(BuildContext context) {
+    _lines.clear();
 
-          if (snapshot.data is _ConnectionLineCreated) {
-            final line = snapshot.data as _ConnectionLineCreated;
-            _lines[line._index] = line;
-          } else if (snapshot.data is _ConnectionInitLines) {
-            for (final line in (snapshot.data as _ConnectionInitLines)._lines) {
+    return StreamBuilder<_ConnectionLine>(
+        stream: widget.stream,
+        builder:
+            (BuildContext context, AsyncSnapshot<_ConnectionLine> snapshot) {
+          if (snapshot.connectionState == ConnectionState.active) {
+            final activeLink =
+                (snapshot.data is _ConnectionLineActive) ? snapshot.data : null;
+
+            if (snapshot.data is _ConnectionLineCreated) {
+              final line = snapshot.data as _ConnectionLineCreated;
               _lines[line._index] = line;
+            } else if (snapshot.data is _ConnectionInitLines) {
+              for (final line
+                  in (snapshot.data as _ConnectionInitLines)._lines) {
+                _lines[line._index] = line;
+              }
+            } else if (snapshot.data is _ConnectionLineRemoved) {
+              _lines.remove((snapshot.data as _ConnectionLineRemoved)._index);
+            } else if (snapshot.data is _ConnectionLineClear) {
+              _lines.clear();
             }
-          } else if (snapshot.data is _ConnectionLineRemoved) {
-            _lines.remove((snapshot.data as _ConnectionLineRemoved)._index);
-          } else if (snapshot.data is _ConnectionLineClear) {
-            _lines.clear();
-          }
 
-          return CustomPaint(
-            size: Size.zero,
-            painter: _LinesPainter(
-                _lines, activeLink, widget.activeColor, widget.connectedColor),
-          );
-        } else
-          return Container();
-      });
+            return CustomPaint(
+              size: Size(10, 10),
+              painter: _LinesPainter(Map<int, _ConnectionLine>.of(_lines),
+                  activeLink, widget.activeColor, widget.connectedColor),
+            );
+          } else
+            return Container();
+        });
+  }
 
 //  void clear() {
 //    setState(() {
@@ -459,6 +507,22 @@ abstract class _ConnectionLine {
 
   final Offset _start;
   final Offset _end;
+
+  @override
+  String toString() {
+    return '$_start -> $_end';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _ConnectionLine &&
+          runtimeType == other.runtimeType &&
+          _start == other._start &&
+          _end == other._end;
+
+  @override
+  int get hashCode => _start.hashCode ^ _end.hashCode;
 }
 
 class _ConnectionLineActive extends _ConnectionLine {
@@ -529,8 +593,12 @@ class _LinesPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_LinesPainter oldDelegate) {
-    return oldDelegate._lines != _lines ||
-        oldDelegate._activeLink != _activeLink;
+    final shouldRepaintMap =
+        !mapEquals<int, _ConnectionLine>(oldDelegate._lines, _lines);
+
+    final shouldRepaintActive = oldDelegate._activeLink != _activeLink;
+
+    return shouldRepaintMap || shouldRepaintActive;
   }
 }
 

@@ -10,14 +10,15 @@ class PagesViewModel {
   BuiltList<Page> pages;
 
   static PagesViewModel fromStore(Store<AppState> store) {
-    int matchingIndex = 0;
+    final pages = ListBuilder<Page>();
 
-    final pages = ListBuilder<Page>(<Page>[
-      for (final item in store.state.matchingStates)
-        Page(item.title,
-            (context) => MatchingPage(matchingIndex: matchingIndex++))
-    ]).build();
+    for (int matchingIndex = 0;
+        matchingIndex < store.state.matchingStates.length;
+        matchingIndex++) {
+      pages.add(Page(store.state.matchingStates[matchingIndex].title,
+          (context) => MatchingPage(matchingIndex: matchingIndex)));
+    }
 
-    return PagesViewModel(pages);
+    return PagesViewModel(pages.build());
   }
 }

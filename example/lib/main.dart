@@ -27,15 +27,22 @@ class MyAppState extends State<MyApp> {
           ..title = 'Question 1'
           ..sources =
               ListBuilder<String>(<String>['Query 1', 'Query 2', 'Query 3'])
-          ..destinations = ListBuilder<String>(
-              <String>['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'])
+          ..destinations = ListBuilder<String>(<String>[
+            'Answer 1',
+            'Answer 2',
+            'Answer 3',
+            'Answer 4',
+            'Answer 5',
+            'Answer 6'
+          ])
           ..connections = MapBuilder<int, int>(<int, int>{0: 0, 1: 1, 2: 2})),
         MatchingState((b) => b
           ..title = 'Test 2'
           ..sources =
               ListBuilder<String>(<String>['Query I', 'Query II', 'Query III'])
           ..destinations = ListBuilder<String>(
-              <String>['Answer I', 'Answer II', 'Answer III', 'Answer IV'])),
+              <String>['Answer I', 'Answer II', 'Answer III', 'Answer IV'])
+          ..connections = MapBuilder<int, int>(<int, int>{0: 0, 1: 1, 2: 2})),
         MatchingState((b) => b
           ..title = 'Test 3'
           ..sources =
