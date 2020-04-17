@@ -80,7 +80,7 @@ class MatchingWidget extends StatefulWidget {
     try {
       final state = context.findAncestorStateOfType<MatchingWidgetState>();
       if (state != null) return state;
-    } catch (e, s) {}
+    } catch (e) {}
 
     return null;
   }
