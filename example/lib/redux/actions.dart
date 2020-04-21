@@ -1,22 +1,30 @@
-abstract class MatchingInplaceAction {
-  MatchingInplaceAction(this.matchingIndex);
 
-  final int matchingIndex;
+abstract class QAInplaceAction {
+  QAInplaceAction(this.index);
+
+  final int index;
 }
 
-class AddConnection extends MatchingInplaceAction {
-  AddConnection(this.sourceIndex, this.destinationIndex, int matchingIndex)
-      : super(matchingIndex);
+class AddConnection extends QAInplaceAction {
+  AddConnection(this.sourceIndex, this.destinationIndex, int index)
+      : super(index);
 
   final int sourceIndex;
   final int destinationIndex;
 }
 
-class RemoveConnection extends MatchingInplaceAction {
-  RemoveConnection(this.sourceIndex, int matchingIndex) : super(matchingIndex);
+class RemoveConnection extends QAInplaceAction {
+  RemoveConnection(this.sourceIndex, int index) : super(index);
+
   final int sourceIndex;
 }
 
-class RemoveAllConnections extends MatchingInplaceAction {
-  RemoveAllConnections(int matchingIndex) : super(matchingIndex);
+class RemoveAllConnections extends QAInplaceAction {
+  RemoveAllConnections(int index) : super(index);
+}
+
+class Order extends QAInplaceAction {
+  Order(this.order, int index) : super(index);
+
+  final List<int> order;
 }

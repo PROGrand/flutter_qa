@@ -2,29 +2,31 @@ import 'package:flutter_qa_example/redux/states.dart';
 
 import 'actions.dart';
 
-MatchingState matchReducer(MatchingState state, dynamic action) {
+QABaseState qaReducer(QABaseState state, dynamic action) {
   if (action is AddConnection) {
-    return state.rebuild(
+    return (state as MatchingState).rebuild(
         (b) => b..connections[action.sourceIndex] = action.destinationIndex);
   } else if (action is RemoveConnection) {
-    return state.rebuild((b) => b..connections.remove(action.sourceIndex));
+    return (state as MatchingState).rebuild((b) => b..connections.remove(action.sourceIndex));
   } else if (action is RemoveAllConnections) {
-    return state.rebuild((b) => b..connections.clear());
+    return (state as MatchingState).rebuild((b) => b..connections.clear());
+  } else if (action is Order) {
+    return (state as OrderingState).rebuild((b) => b..ordered.replace(action.order));
   } else {
     return state;
   }
 }
 
 AppState appReducer(AppState state, dynamic action) {
-  if (action is MatchingInplaceAction) {
+  if (action is QAInplaceAction) {
     return state.rebuild((b) {
-      b.matchingStates.clear();
+      b.states.clear();
 
-      for (int n = 0; n < state.matchingStates.length; n++) {
-        final index = action.matchingIndex;
-        final m = state.matchingStates[n];
+      for (int n = 0; n < state.states.length; n++) {
+        final index = action.index;
+        final m = state.states[n];
 
-        b.matchingStates.add(n == index ? matchReducer(m, action) : m);
+        b.states.add(n == index ? qaReducer(m as QABaseState, action) : m);
       }
     });
   } else {

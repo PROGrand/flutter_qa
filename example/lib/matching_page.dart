@@ -6,11 +6,10 @@ import 'package:flutter_qa_example/redux/views/matching_view_model.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 class MatchingPage extends StatefulWidget {
-  MatchingPage({Key key, this.matchingIndex}) : super(key: key) {
-    assert(3 > this.matchingIndex);
+  MatchingPage({Key key, this.qaIndex}) : super(key: key) {
   }
 
-  final int matchingIndex;
+  final int qaIndex;
 
   @override
   State<MatchingPage> createState() {
@@ -30,7 +29,7 @@ class MatchingPageState extends State<MatchingPage> {
   Widget build(BuildContext context) {
     return StoreConnector<AppState, MatchingViewModel>(
         converter: (store) =>
-            MatchingViewModel.fromStore(store, widget.matchingIndex),
+            MatchingViewModel.fromStore(store, widget.qaIndex),
         builder: _build,
         distinct: true,
         //in this example it is for mark only.
@@ -41,6 +40,8 @@ class MatchingPageState extends State<MatchingPage> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
+        SizedBox(height: 8,),
+        Text('Lorem ipsum dolor sit amet.', style: Theme.of(context).textTheme.title),
         MatchingWidget(
           key: matchingKey,
           builder: MatchingWidgetBuilder(

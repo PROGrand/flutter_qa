@@ -1,3 +1,7 @@
+## 1.1.0
+
+Ordering widget added.
+
 ## 1.0.0+1
 
 Stable.

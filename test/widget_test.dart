@@ -3,11 +3,41 @@ import 'package:flutter/material.dart';
 import 'package:flutter_qa/qa_widgets/qa_matching.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+bool onAddCalled = false;
+bool onRemoveCalled = false;
+bool onClearCalled = false;
+
 void main() {
-  testWidgets('Verify Platform version', (WidgetTester tester) async {
+  testWidgets('Test matching widget', (WidgetTester tester) async {
     await tester.pumpWidget(MatchingTestApp());
 
-    expect(find.text('Query 2'), findsOneWidget);
+    expect(find.text('Clear'), findsOneWidget);
+expect(find.text('Query 2'), findsNWidgets(1));
+
+    await tester.press(find.text('Query 2'));
+    await tester.pump();
+    await tester.press(find.text('Answer 2'));
+    await tester.pump();
+
+    final src_rect = tester.getRect(find.text('Query 2'));
+    final dst_rect = tester.getRect(find.text('Answer 2'));
+
+    await tester.dragFrom(src_rect.center, dst_rect.center);
+    await tester.pump();
+
+    await tester.dragFrom(src_rect.center, (src_rect.center + dst_rect.center) / 2);
+    await tester.pump();
+
+    await tester.dragFrom(dst_rect.center, (src_rect.center + dst_rect.center) / 2);
+    await tester.pump();
+
+    await tester.tap(find.text('Clear'));
+
+    expect(onClearCalled, isTrue);
+
+    expect(matchingWidgetTest(), isTrue);
+
+//    await tester.dragFrom(src_rect.center, (dst_rect.center + src_rect.center) / 2);
   });
 }
 
@@ -37,7 +67,8 @@ class MatchingTestPage extends StatefulWidget {
 }
 
 class MatchingTestPageState extends State<MatchingTestPage> {
-  final matchingKey = MatchingWidget.createGlobalKey();
+  final matchingKey1 = MatchingWidget.createGlobalKey();
+  final matchingKey2 = MatchingWidget.createGlobalKey();
 
   @override
   void initState() {
@@ -46,17 +77,44 @@ class MatchingTestPageState extends State<MatchingTestPage> {
 
   @override
   Widget build(BuildContext context) {
+    return IndexedStack(
+      children: <Widget>[
+        Visibility(
+          child: _buildColumn(
+              matchingKey1,
+              'Clear',
+              context,
+              Theme.of(context).primaryColor.withOpacity(0.25),
+              Theme.of(context).primaryColor),
+        ),
+        Visibility(
+          child: _buildColumn(matchingKey2, 'Clear2', context, null, null),
+          visible: false,
+        )
+      ],
+    );
+  }
+
+  Column _buildColumn(GlobalKey<MatchingWidgetState> k, String ct,
+      BuildContext context, Color c1, Color c2) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Expanded(
           child: MatchingWidget(
-            key: matchingKey,
+            key: k,
             builder: MatchingWidgetBuilder(
-                activeColor: Theme.of(context).primaryColor.withOpacity(0.25),
-                connectedColor: Theme.of(context).primaryColor,
-                onAddConnection: null,
-                onRemoveConnection: null,
-                onClearAll: null,
+                activeColor: c1,
+                connectedColor: c2,
+                onAddConnection: (int s, int d) {
+                  onAddCalled = true;
+                },
+                onRemoveConnection: (int s) {
+                  onRemoveCalled = true;
+                },
+                onClearAll: () {
+                  onClearCalled = true;
+                },
                 sourcesCount: 3,
                 destinationsCount: 4,
                 build: (BuildContext context, bool query, int index) =>
@@ -68,9 +126,9 @@ class MatchingTestPageState extends State<MatchingTestPage> {
         Padding(
             padding: EdgeInsets.only(bottom: 16),
             child: RaisedButton(
-              child: Text('Clear'),
+              child: Text(ct),
               onPressed: () {
-                matchingKey.currentState.clear();
+                k.currentState.clear();
               },
             ))
       ],

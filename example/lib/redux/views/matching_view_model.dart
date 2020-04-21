@@ -35,16 +35,16 @@ class MatchingViewModel {
   }
 
   static MatchingViewModel fromStore(
-          Store<AppState> store, int matchingIndex) =>
+          Store<AppState> store, int stateIndex) =>
       MatchingViewModel(
-          matching: store.state.matchingStates[matchingIndex],
+          matching: store.state.states[stateIndex] as MatchingState,
           addConnection: (source, destination) {
-            store.dispatch(AddConnection(source, destination, matchingIndex));
+            store.dispatch(AddConnection(source, destination, stateIndex));
           },
           removeConnection: (int source) {
-            store.dispatch(RemoveConnection(source, matchingIndex));
+            store.dispatch(RemoveConnection(source, stateIndex));
           },
           clearAll: () {
-            store.dispatch(RemoveAllConnections(matchingIndex));
+            store.dispatch(RemoveAllConnections(stateIndex));
           });
 }

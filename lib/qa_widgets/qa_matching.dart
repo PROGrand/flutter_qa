@@ -75,8 +75,6 @@ class MatchingWidget extends StatefulWidget {
 
   /// Allows to get current MatchingWidget in context.
   static MatchingWidgetState of(BuildContext context) {
-    assert(context != null);
-
     try {
       final state = context.findAncestorStateOfType<MatchingWidgetState>();
       if (state != null) return state;
@@ -196,21 +194,24 @@ class _BoxesState extends State<_Boxes> with TickerProviderStateMixin {
       ));
 
   List<Widget> _buildQueries() {
+    var ret = <Widget>[];
+
     final matchingState = MatchingWidget.of(context);
-    if (null == matchingState) {
-      return List<Widget>();
+    if (null != matchingState) {
+      final builder = matchingState.widget._builder;
+      ret = <Widget>[
+        for (int n = 0; n < builder.sourcesCount; n++)
+          Padding(
+              padding: EdgeInsets.all(16),
+              child: _QueryWidget(
+                index: n,
+                controller: widget.controller,
+                child: builder.build(context, true, n),
+              ))
+      ];
     }
-    final builder = matchingState.widget._builder;
-    return <Widget>[
-      for (int n = 0; n < builder.sourcesCount; n++)
-        Padding(
-            padding: EdgeInsets.all(16),
-            child: _QueryWidget(
-              index: n,
-              controller: widget.controller,
-              child: builder.build(context, true, n),
-            ))
-    ];
+
+    return ret;
   }
 
   Widget _answers() => Padding(
@@ -221,19 +222,24 @@ class _BoxesState extends State<_Boxes> with TickerProviderStateMixin {
       ));
 
   List<Widget> _buildAnswers() {
+    var ret = <Widget>[];
+
     final matchingState = MatchingWidget.of(context);
-    if (null == matchingState) {
-      return <Widget>[];
+
+    if (null != matchingState) {
+      final builder = matchingState.widget._builder;
+      ret = <Widget>[
+        for (int n = 0; n < builder.destinationsCount; n++)
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: _AnswerWidget(
+                index: n,
+                builder: (context) => builder.build(context, false, n)),
+          )
+      ];
     }
-    final builder = matchingState.widget._builder;
-    return <Widget>[
-      for (int n = 0; n < builder.destinationsCount; n++)
-        Padding(
-          padding: EdgeInsets.all(16),
-          child: _AnswerWidget(
-              index: n, builder: (context) => builder.build(context, false, n)),
-        )
-    ];
+
+    return ret;
   }
 }
 
@@ -311,7 +317,6 @@ class _QueryWidgetState extends State<_QueryWidget> {
 
   bool _onPanDown(Offset position) {
     final renderBox = context.findRenderObject() as RenderBox;
-    assert(null != renderBox);
     return null != renderBox?.globalToLocal(position);
   }
 
@@ -553,6 +558,27 @@ class _ConnectionLineClear extends _ConnectionLine {
   _ConnectionLineClear() : super(null, null);
 }
 
+bool matchingWidgetTest() {
+  _CustomPanGestureRecognizer rec = _CustomPanGestureRecognizer(
+      onPanUpdate: (Offset offset) {},
+      onPanDown: (Offset offset) {
+        return true;
+      },
+      onPanEnd: (Offset offset) {});
+  String s = rec.debugDescription;
+  rec.didStopTrackingLastPointer(0);
+
+  _ConnectionLineActive l1 = _ConnectionLineActive(Offset(1, 0), Offset(0, 1));
+  _ConnectionLineActive l2 = _ConnectionLineActive(Offset(1, 0), Offset(0, 1));
+  _ConnectionLineActive l3 = _ConnectionLineActive(Offset(1, 0), Offset(1, 1));
+  return l1.hashCode == l2.hashCode &&
+      l1 == l2 &&
+      l1.hashCode != l3.hashCode &&
+      l1 != l3 &&
+      s == 'customPan' &&
+      l1.toString() != "";
+}
+
 class _LinesPainter extends CustomPainter {
   _LinesPainter(
       this._lines, this._activeLink, this.activeColor, this.connectedColor);
@@ -616,7 +642,7 @@ class _CustomPanGestureRecognizer extends OneSequenceGestureRecognizer {
 
   @override
   void addPointer(PointerEvent event) {
-    if (onPanDown(event.position)) {
+    if (null != onPanDown && onPanDown(event.position)) {
       startTrackingPointer(event.pointer);
       resolve(GestureDisposition.accepted);
     } else {
@@ -626,11 +652,13 @@ class _CustomPanGestureRecognizer extends OneSequenceGestureRecognizer {
 
   @override
   void handleEvent(PointerEvent event) {
-    if (event is PointerMoveEvent) {
+    if (null != onPanUpdate && event is PointerMoveEvent) {
       onPanUpdate(event.position);
-    }
-    if (event is PointerUpEvent) {
-      onPanEnd(event.position);
+    } else if (event is PointerUpEvent) {
+      if (null != onPanEnd) {
+        onPanEnd(event.position);
+      }
+
       stopTrackingPointer(event.pointer);
     }
   }
