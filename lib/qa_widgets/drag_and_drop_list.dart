@@ -271,8 +271,9 @@ class _DragAndDropListState<T> extends State<DragAndDropList<T>> {
         rows.insert(index, data);
         widget.onDragFinish(_currentDraggingIndex, index);
       } else {
-        rows.insert(index + 1, data);
-        widget.onDragFinish(_currentDraggingIndex, index + 1);
+        final at = min(index + 1, rows.length - 1);
+        rows.insert(at, data);
+        widget.onDragFinish(_currentDraggingIndex, at);
       }
       rows.forEach((it) {
         it.extraTop = 0.0;
@@ -402,7 +403,7 @@ class DraggableListItem<T> extends StatelessWidget {
                 it.localToGlobal(it.semanticBounds.topCenter).dy);
           },
           onDragCompleted: onDragCompleted,
-          onMyDraggableCanceled: (_, _2) {
+          onMyDraggableCanceled: (Velocity velocity, Offset offset) {
             cancelCallback();
           });
     }

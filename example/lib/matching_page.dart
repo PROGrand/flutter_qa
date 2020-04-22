@@ -6,8 +6,7 @@ import 'package:flutter_qa_example/redux/views/matching_view_model.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 class MatchingPage extends StatefulWidget {
-  MatchingPage({Key key, this.qaIndex}) : super(key: key) {
-  }
+  MatchingPage({Key key, this.qaIndex}) : super(key: key);
 
   final int qaIndex;
 

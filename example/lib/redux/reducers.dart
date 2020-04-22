@@ -26,7 +26,7 @@ AppState appReducer(AppState state, dynamic action) {
         final index = action.index;
         final m = state.states[n];
 
-        b.states.add(n == index ? qaReducer(m as QABaseState, action) : m);
+        b.states.add(n == index ? qaReducer(m, action) : m);
       }
     });
   } else {

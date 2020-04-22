@@ -1,3 +1,8 @@
+## 1.1.0+1
+
+Some dart analysis and formatting.
+Draggable test.
+
 ## 1.1.0
 
 Ordering widget added.

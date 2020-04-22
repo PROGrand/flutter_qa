@@ -6,7 +6,7 @@ import 'package:flutter_qa_example/redux/views/ordering_view_model.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 class OrderingPage extends StatefulWidget {
-  OrderingPage({Key key, this.qaIndex}) : super(key: key) {}
+  OrderingPage({Key key, this.qaIndex}) : super(key: key);
 
   final int qaIndex;
 
