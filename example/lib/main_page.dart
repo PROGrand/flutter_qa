@@ -68,7 +68,7 @@ class MainPage extends StatelessWidget {
                 bottom: 0,
                 child: TabBar(
                   isScrollable: true,
-                  tabs: vm.pages.map((Page page) {
+                  tabs: vm.pages.map((QAPage page) {
                     return Tab(
                       text: page.title,
                     );

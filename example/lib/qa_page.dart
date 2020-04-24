@@ -4,8 +4,8 @@ import 'package:built_value/built_value.dart';
 
 import 'page_builder.dart';
 
-class Page {
-  Page(this.title, this.builder);
+class QAPage {
+  QAPage(this.title, this.builder);
 
   final String title;
 
@@ -14,7 +14,7 @@ class Page {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Page && title == other.title;
+    return other is QAPage && title == other.title;
   }
 
   @override

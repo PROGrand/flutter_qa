@@ -8,14 +8,14 @@ import 'package:redux/redux.dart';
 class PagesViewModel {
   PagesViewModel(this.pages);
 
-  BuiltList<Page> pages;
+  BuiltList<QAPage> pages;
 
   static PagesViewModel fromStore(Store<AppState> store) {
-    final pages = ListBuilder<Page>();
+    final pages = ListBuilder<QAPage>();
 
     for (int qaIndex = 0; qaIndex < store.state.states.length; qaIndex++) {
       var state = store.state.states[qaIndex];
-      pages.add(Page(
+      pages.add(QAPage(
           state.title,
           (context) => (state is MatchingState)
               ? MatchingPage(qaIndex: qaIndex)
