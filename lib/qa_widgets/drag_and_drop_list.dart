@@ -273,7 +273,7 @@ class _DragAndDropListState<T> extends State<DragAndDropList<T>> {
       } else {
         final at = min(index + 1, rows.length - 1);
         rows.insert(at, data);
-        widget.onDragFinish(_currentDraggingIndex, at);
+        widget.onDragFinish(_currentDraggingIndex, at + 1);
       }
       rows.forEach((it) {
         it.extraTop = 0.0;

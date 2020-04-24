@@ -1,3 +1,7 @@
+## 1.1.0+2
+
+Fixed last two items swap.
+
 ## 1.1.0+1
 
 Some dart analysis and formatting.
