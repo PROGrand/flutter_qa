@@ -19,5 +19,5 @@ Example project consumes [Redux](https://github.com/johnpryan/redux.dart).
 
 If you have errors about *.g.dart missed files - run following line in terminal:
 
-$ flutter pub run build_runner build
+`$ flutter pub run build_runner build`
 
