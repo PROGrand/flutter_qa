@@ -1,7 +1,3 @@
-//flutter pub run build_runner build
-
-import 'package:built_value/built_value.dart';
-
 import 'page_builder.dart';
 
 class QAPage {
@@ -24,7 +20,6 @@ class QAPage {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('Page')..add('title', title))
-        .toString();
+    return title.toString();
   }
 }

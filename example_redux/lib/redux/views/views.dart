@@ -1,8 +1,8 @@
 import 'package:built_collection/built_collection.dart';
-import 'package:flutter_qa_example/matching_page.dart';
-import 'package:flutter_qa_example/ordering_page.dart';
-import 'package:flutter_qa_example/qa_page.dart';
-import 'package:flutter_qa_example/redux/states.dart';
+import 'package:flutter_qa_example_redux/matching_page.dart';
+import 'package:flutter_qa_example_redux/ordering_page.dart';
+import 'package:flutter_qa_example_redux/qa_page.dart';
+import 'package:flutter_qa_example_redux/redux/states.dart';
 import 'package:redux/redux.dart';
 
 class PagesViewModel {

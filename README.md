@@ -13,7 +13,8 @@ Flutter Q&A widgets.
 <img height="704px" width="352px" src="https://github.com/PROGrand/flutter_qa/raw/master/video.gif">
 
 ## Example
-Example project consumes [Redux](https://github.com/johnpryan/redux.dart).
+Demo example project stores data state in global namespace.
+Advanced example project consumes [Redux](https://github.com/johnpryan/redux.dart).
 
 ## IMPORTANT
 

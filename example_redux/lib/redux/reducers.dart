@@ -1,4 +1,4 @@
-import 'package:flutter_qa_example/redux/states.dart';
+import 'package:flutter_qa_example_redux/redux/states.dart';
 
 import 'actions.dart';
 

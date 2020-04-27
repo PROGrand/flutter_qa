@@ -1,14 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_qa/qa_widgets/qa_draglist.dart';
-import 'package:flutter_qa_example/redux/states.dart';
-import 'package:flutter_qa_example/redux/views/ordering_view_model.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+
+
+/// For demo purposes only. Save production data state using appropriate engines like redux.
+
+final List<OrderableItem> items = <OrderableItem>[
+  OrderableItem()
+    ..title = 'Item 1'
+    ..color = Colors.blue[300],
+  OrderableItem()
+    ..title = 'Item 2'
+    ..color = Colors.blue[400],
+  OrderableItem()
+    ..title = 'Item 3'
+    ..color = Colors.blue[500],
+  OrderableItem()
+    ..title = 'Item 4'
+    ..color = Colors.blue[600],
+  OrderableItem()
+    ..title = 'Item 5'
+    ..color = Colors.blue[700],
+  OrderableItem()
+    ..title = 'Item 6'
+    ..color = Colors.blue[800]
+];
+
+int n = 0;
+Iterable<int> order = items.map<int>((f)=>n++);
+
+//////////////////////////////
 
 class OrderingPage extends StatefulWidget {
-  OrderingPage({Key key, this.qaIndex}) : super(key: key);
-
-  final int qaIndex;
+  OrderingPage({Key key}) : super(key: key);
 
   @override
   State<OrderingPage> createState() {
@@ -17,23 +41,16 @@ class OrderingPage extends StatefulWidget {
 }
 
 class OrderingPageState extends State<OrderingPage> {
+
+
   @override
   void initState() {
     super.initState();
+
   }
 
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, OrderingViewModel>(
-        converter: (store) =>
-            OrderingViewModel.fromStore(store, widget.qaIndex),
-        builder: _build,
-        distinct: true,
-        //in this example it is for mark only.
-        rebuildOnChange: false);
-  }
-
-  Widget _build(BuildContext context, OrderingViewModel vm) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -44,9 +61,11 @@ class OrderingPageState extends State<OrderingPage> {
             style: Theme.of(context).textTheme.title),
         DragListWidget<OrderableItem>(
             builder: DragListWidgetBuilder<OrderableItem>(
-                onOrder: vm.order,
-                ordered: vm.ordering.ordered,
-                items: vm.ordering.items,
+                onOrder: (new_order){ setState(() {
+                  order = new_order;
+                }); },
+                ordered: order,
+                items: items,
                 build: (BuildContext context, OrderableItem item) =>
                     _builtItem(item))),
       ],
@@ -62,6 +81,11 @@ class OrderingPageState extends State<OrderingPage> {
       ),
     ));
   }
+}
+
+class OrderableItem{
+  String title;
+  Color color;
 }
 
 

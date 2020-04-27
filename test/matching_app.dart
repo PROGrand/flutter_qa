@@ -82,8 +82,7 @@ class MatchingTestPageState extends State<MatchingTestPage> {
                 destinationsCount: 4,
                 build: (BuildContext context, bool query, int index) =>
                     (query ? _query(index) : _answer(index)),
-                connections:
-                    MapBuilder<int, int>(<int, int>{0: 1, 1: 2, 2: 0}).build()),
+                connections: <int, int>{0: 1, 1: 2, 2: 0}),
           ),
         ),
         Padding(

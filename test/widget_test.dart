@@ -5,6 +5,7 @@ import 'package:flutter_qa/qa_widgets/qa_matching.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 part 'matching_app.dart';
+
 part 'ordering_app.dart';
 
 void main() {
@@ -43,19 +44,18 @@ void main() {
   });
 
   testWidgets('Test ordering widget', (WidgetTester tester) async {
-          await tester.pumpWidget(OrderingTestApp());
+    await tester.pumpWidget(OrderingTestApp());
 
-          expect(find.text('3'), findsOneWidget);
+    expect(find.text('3'), findsOneWidget);
 
-          await tester.pump();
+    await tester.pump();
 
-          final src_rect = tester.getRect(find.text('3'));
-          final dst_rect = tester.getRect(find.text('1'));
+    final src_rect = tester.getRect(find.text('3'));
+    final dst_rect = tester.getRect(find.text('1'));
 
-          await tester.dragFrom(src_rect.center, dst_rect.center);
-          await tester.pump();
+    await tester.dragFrom(src_rect.center, dst_rect.center);
+    await tester.pump();
 
-          expect(onOrderCalled, isTrue);
+    expect(onOrderCalled, isTrue);
   });
 }
-

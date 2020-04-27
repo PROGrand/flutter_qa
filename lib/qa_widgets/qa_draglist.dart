@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:built_collection/built_collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -16,12 +15,12 @@ class DragListWidgetBuilder<T> {
   DragListWidgetBuilder({this.ordered, this.items, this.build, this.onOrder});
 
   /// Ordered list of [items] elements.
-  final BuiltList<int> ordered;
+  final Iterable<int> ordered;
 
   /// Items.
   ///
   /// Elements positions are used in [ordered] array field.
-  final BuiltList<T> items;
+  final List<T> items;
 
   /// Constructs item widgets.
   final Widget Function(BuildContext context, T item) build;

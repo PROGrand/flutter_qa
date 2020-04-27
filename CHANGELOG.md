@@ -1,3 +1,7 @@
+## 1.1.0+5
+
+Simple example added.
+
 ## 1.1.0+4
 
 Page class renamed in example to avoid Navigator conflict.

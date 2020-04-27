@@ -33,7 +33,7 @@ class MatchingWidgetBuilder {
   /// Map of connections from source to destinations items.
   ///
   /// Zero based.
-  final BuiltMap<int, int> connections;
+  final Map<int, int> connections;
 
   /// Callback when new connection is created.
   final Function(int sourceIndex, int destinationIndex) onAddConnection;
