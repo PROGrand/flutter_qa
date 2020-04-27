@@ -18,7 +18,7 @@ jobs:
             - fonts-droid
             - lcov
       before_install:
-        - cd example
+        - cd example_redux
         - echo yes | sdkmanager "tools" >/dev/null
         - echo yes | sdkmanager "platform-tools" >/dev/null
         - echo yes | sdkmanager "build-tools;28.0.3" >/dev/null
@@ -34,15 +34,15 @@ jobs:
         - gem install coveralls-lcov
       before_script:
         - ./flutter/bin/flutter pub get
-        - cd example
+        - cd example_redux
         - ../flutter/bin/flutter pub run build_runner build
       script:
         - ../flutter/bin/flutter -v build apk
         - ../flutter/bin/flutter test --coverage
         - cd ..
-        - sed -i 's/SF:lib\\/SF:example\\lib\\/' example/coverage/lcov.info
-        - sed -i 's/SF:lib\//SF:example\/lib\//' example/coverage/lcov.info
+        - sed -i 's/SF:lib\\/SF:example_redux\\lib\\/' example_redux/coverage/lcov.info
+        - sed -i 's/SF:lib\//SF:example_redux\/lib\//' example_redux/coverage/lcov.info
         - ./flutter/bin/flutter test --coverage
-        - lcov -a example/coverage/lcov.info -a coverage/lcov.info -o total.info
+        - lcov -a example_redux/coverage/lcov.info -a coverage/lcov.info -o total.info
       after_success:
         - coveralls-lcov total.info
