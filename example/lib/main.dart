@@ -1,4 +1,3 @@
-import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 
 import 'main_page.dart';
@@ -15,7 +14,6 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-
   @override
   Widget build(BuildContext context) => MaterialApp(
         theme: _buildTheme(),

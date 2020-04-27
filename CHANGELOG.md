@@ -1,4 +1,4 @@
-## 1.1.0+5
+## 1.1.0+6
 
 Simple example added.
 

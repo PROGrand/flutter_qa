@@ -59,7 +59,7 @@ class OrderingTestPageState extends State<OrderingTestPage> {
         Expanded(
           child: DragListWidget<String>(
             builder: DragListWidgetBuilder<String>(
-              ordered: ListBuilder<int>(<int>[3, 2, 1, 0]).build(),
+              ordered: <int>[3, 2, 1, 0],
               items: <String>['3', '2', '1', '0'],
               onOrder: (List<int> ordered) {
                 onOrderCalled = true;

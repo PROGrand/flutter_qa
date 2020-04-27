@@ -39,8 +39,11 @@ class MatchingPageState extends State<MatchingPage> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        SizedBox(height: 8,),
-        Text('Lorem ipsum dolor sit amet.', style: Theme.of(context).textTheme.title),
+        SizedBox(
+          height: 8,
+        ),
+        Text('Lorem ipsum dolor sit amet.',
+            style: Theme.of(context).textTheme.title),
         MatchingWidget(
           key: matchingKey,
           builder: MatchingWidgetBuilder(
