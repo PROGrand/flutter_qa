@@ -35,6 +35,7 @@ jobs:
       before_script:
         - ./flutter/bin/flutter pub get
         - cd example_redux
+        - ../flutter/bin/flutter pub get
         - ../flutter/bin/flutter pub run build_runner build
       script:
         - ../flutter/bin/flutter -v build apk
