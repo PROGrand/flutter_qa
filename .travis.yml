@@ -18,6 +18,8 @@ jobs:
             - fonts-droid
             - lcov
       before_install:
+        - mkdir -p ~/.android
+        - touch ~/.android/repositories.cfg
         - cd example_redux
         - echo yes | sdkmanager "tools" >/dev/null
         - echo yes | sdkmanager "platform-tools" >/dev/null
