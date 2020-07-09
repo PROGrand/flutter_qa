@@ -1,3 +1,7 @@
+## 1.1.0+9
+
+Lint options disabled for android release apk builds.
+
 ## 1.1.0+8
 
 Android platform tools in travis: 29.0.2.
