@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_qa/qa_widgets/qa_matching.dart';
 
-
 /// For demo purposes only. Save production data state using appropriate engines like redux.
 
 Map<int, int> connections = <int, int>{0: 1, 1: 2};
@@ -27,9 +26,7 @@ class MatchingPage extends StatefulWidget {
   }
 }
 
-
 class MatchingPageState extends State<MatchingPage> {
-
   final matchingKey = MatchingWidget.createGlobalKey();
 
   @override
@@ -80,34 +77,38 @@ class MatchingPageState extends State<MatchingPage> {
     );
   }
 
-  Container _query(int index) {
-    return Container(
-        padding: EdgeInsets.all(16),
-        color: const Color(0xffe4f2fd),
-        foregroundDecoration: BoxDecoration(
-            border: Border.all(
-          color: const Color(0xffc2d2e1),
-          width: 2,
-        )),
-        child: Center(
-          child: Text('${sources[index]}',
-              style: TextStyle(color: Colors.black, fontSize: 12.0)),
-        ));
+  Widget _query(int index) {
+    return Padding(
+        padding: EdgeInsets.only(top: 8, left: 16, bottom: 8),
+        child: Container(
+            padding: EdgeInsets.all(16),
+            color: const Color(0xffe4f2fd),
+            foregroundDecoration: BoxDecoration(
+                border: Border.all(
+              color: const Color(0xffc2d2e1),
+              width: 2,
+            )),
+            child: Center(
+              child: Text('${sources[index]}',
+                  style: TextStyle(color: Colors.black, fontSize: 12.0)),
+            )));
   }
 
-  Container _answer(int index) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      color: const Color(0xffe4f2fd),
-      foregroundDecoration: BoxDecoration(
-          border: Border.all(
-        color: const Color(0xffc2d2e1),
-        width: 2,
-      )),
-      child: Center(
-        child: Text('${destinations[index]}',
-            style: TextStyle(color: Colors.black, fontSize: 12.0)),
-      ),
-    );
+  Widget _answer(int index) {
+    return Padding(
+        padding: EdgeInsets.only(top: 8, right: 16, bottom: 8),
+        child: Container(
+          padding: EdgeInsets.all(16),
+          color: const Color(0xffe4f2fd),
+          foregroundDecoration: BoxDecoration(
+              border: Border.all(
+            color: const Color(0xffc2d2e1),
+            width: 2,
+          )),
+          child: Center(
+            child: Text('${destinations[index]}',
+                style: TextStyle(color: Colors.black, fontSize: 12.0)),
+          ),
+        ));
   }
 }

@@ -1,3 +1,7 @@
+## 1.1.0+7
+
+Padding removed from items. User has ability to provide its own padding.
+
 ## 1.1.0+6
 
 Simple example added.

@@ -72,33 +72,37 @@ class MatchingPageState extends State<MatchingPage> {
   }
 }
 
-Container _query(int index, MatchingViewModel vm) {
-  return Container(
-      padding: EdgeInsets.all(16),
-      color: const Color(0xffe4f2fd),
-      foregroundDecoration: BoxDecoration(
-          border: Border.all(
-        color: const Color(0xffc2d2e1),
-        width: 2,
-      )),
-      child: Center(
-        child: Text('${vm.matching.sources[index]}',
-            style: TextStyle(color: Colors.black, fontSize: 12.0)),
-      ));
+Widget _query(int index, MatchingViewModel vm) {
+  return Padding(
+      padding: EdgeInsets.only(top: 8, left: 16, bottom: 8),
+      child: Container(
+          padding: EdgeInsets.all(16),
+          color: const Color(0xffe4f2fd),
+          foregroundDecoration: BoxDecoration(
+              border: Border.all(
+            color: const Color(0xffc2d2e1),
+            width: 2,
+          )),
+          child: Center(
+            child: Text('${vm.matching.sources[index]}',
+                style: TextStyle(color: Colors.black, fontSize: 12.0)),
+          )));
 }
 
-Container _answer(int index, MatchingViewModel vm) {
-  return Container(
-    padding: EdgeInsets.all(16),
-    color: const Color(0xffe4f2fd),
-    foregroundDecoration: BoxDecoration(
-        border: Border.all(
-      color: const Color(0xffc2d2e1),
-      width: 2,
-    )),
-    child: Center(
-      child: Text('${vm.matching.destinations[index]}',
-          style: TextStyle(color: Colors.black, fontSize: 12.0)),
-    ),
-  );
+Widget _answer(int index, MatchingViewModel vm) {
+  return Padding(
+      padding: EdgeInsets.only(top: 8, right: 16, bottom: 8),
+      child: Container(
+        padding: EdgeInsets.all(16),
+        color: const Color(0xffe4f2fd),
+        foregroundDecoration: BoxDecoration(
+            border: Border.all(
+          color: const Color(0xffc2d2e1),
+          width: 2,
+        )),
+        child: Center(
+          child: Text('${vm.matching.destinations[index]}',
+              style: TextStyle(color: Colors.black, fontSize: 12.0)),
+        ),
+      ));
 }

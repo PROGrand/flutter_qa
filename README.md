@@ -7,12 +7,15 @@
 Flutter Q&A widgets.
 
 ## Widgets:
+
 * Matching
 
 ## Demo
+
 <img height="704px" width="352px" src="https://github.com/PROGrand/flutter_qa/raw/master/video.gif">
 
 ## Example
+
 Demo example project stores data state in global namespace.
 Advanced example project consumes [Redux](https://github.com/johnpryan/redux.dart).
 

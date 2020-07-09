@@ -185,12 +185,10 @@ class _BoxesState extends State<_Boxes> with TickerProviderStateMixin {
         children: <Widget>[_queries(), _answers()],
       );
 
-  Widget _queries() => Padding(
-      padding: EdgeInsets.all(16),
-      child: Column(
+  Widget _queries() => Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: _buildQueries(),
-      ));
+      );
 
   List<Widget> _buildQueries() {
     var ret = <Widget>[];
@@ -200,25 +198,21 @@ class _BoxesState extends State<_Boxes> with TickerProviderStateMixin {
       final builder = matchingState.widget._builder;
       ret = <Widget>[
         for (int n = 0; n < builder.sourcesCount; n++)
-          Padding(
-              padding: EdgeInsets.all(16),
-              child: _QueryWidget(
-                index: n,
-                controller: widget.controller,
-                child: builder.build(context, true, n),
-              ))
+          _QueryWidget(
+            index: n,
+            controller: widget.controller,
+            child: builder.build(context, true, n),
+          )
       ];
     }
 
     return ret;
   }
 
-  Widget _answers() => Padding(
-      padding: EdgeInsets.all(16),
-      child: Column(
+  Widget _answers() => Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: _buildAnswers(),
-      ));
+      );
 
   List<Widget> _buildAnswers() {
     var ret = <Widget>[];
@@ -229,12 +223,8 @@ class _BoxesState extends State<_Boxes> with TickerProviderStateMixin {
       final builder = matchingState.widget._builder;
       ret = <Widget>[
         for (int n = 0; n < builder.destinationsCount; n++)
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: _AnswerWidget(
-                index: n,
-                builder: (context) => builder.build(context, false, n)),
-          )
+          _AnswerWidget(
+              index: n, builder: (context) => builder.build(context, false, n)),
       ];
     }
 
