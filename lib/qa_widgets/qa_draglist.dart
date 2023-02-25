@@ -1,6 +1,4 @@
 import 'dart:math';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -15,25 +13,25 @@ class DragListWidgetBuilder<T> {
   DragListWidgetBuilder({this.ordered, this.items, this.build, this.onOrder});
 
   /// Ordered list of [items] elements.
-  final Iterable<int> ordered;
+  final Iterable<int>? ordered;
 
   /// Items.
   ///
   /// Elements positions are used in [ordered] array field.
-  final List<T> items;
+  final List<T>? items;
 
   /// Constructs item widgets.
-  final Widget Function(BuildContext context, T item) build;
+  final Widget Function(BuildContext context, T item)? build;
 
   /// Callback when items are ordered.
-  Function(List<int> ordered) onOrder;
+  Function(List<int> ordered)? onOrder;
 }
 
 /// Ordered list of items with drag and drop support.
 ///
 /// Allows to order items.
 class DragListWidget<T> extends StatefulWidget {
-  const DragListWidget({Key key, @required DragListWidgetBuilder<T> builder})
+  const DragListWidget({Key? key, required DragListWidgetBuilder<T> builder})
       : this._builder = builder,
         super(key: key);
 
@@ -44,7 +42,7 @@ class DragListWidget<T> extends StatefulWidget {
 }
 
 class _DragListWidgetState<T> extends State<DragListWidget<T>> {
-  List<int> ordered;
+  List<int>? ordered;
 
   @override
   void initState() {
@@ -52,24 +50,24 @@ class _DragListWidgetState<T> extends State<DragListWidget<T>> {
 
     int n = 0;
     ordered = null != widget._builder.ordered
-        ? List<int>.from(widget._builder.ordered, growable: true)
-        : List<int>.from(widget._builder.items.map<int>((_) {
+        ? List<int>.from(widget._builder.ordered!, growable: true)
+        : List<int>.from(widget._builder.items!.map<int>((_) {
             return n++;
           }), growable: true);
   }
 
   @override
   Widget build(BuildContext context) => DragAndDropList<T>(
-        <T>[for (final n in ordered) widget._builder.items[n]],
+        <T>[for (final n in ordered!) widget._builder.items![n]],
         itemBuilder: (BuildContext context, item) =>
-            widget._builder.build(context, item),
+            widget._builder.build!(context, item),
         onDragFinish: (before, after) {
-          final position = ordered[before];
-          ordered.removeAt(before);
-          ordered.insert(after, position);
+          final position = ordered![before];
+          ordered?.removeAt(before);
+          ordered?.insert(after, position);
 
           if (null != widget._builder.onOrder) {
-            widget._builder.onOrder(ordered);
+            widget._builder.onOrder!(ordered!);
           }
         },
         canBeDraggedTo: (one, two) => true,

@@ -1,27 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_qa_example/matching_page.dart';
 import 'package:flutter_qa_example/ordering_page.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) => DefaultTabController(
-      length: 2,
-      child: CustomScrollView(
-        slivers: <Widget>[_appBar(context), _tabs(context)],
-      ));
+        length: 2,
+        child: CustomScrollView(
+          slivers: <Widget>[_appBar(context), _tabs(context)],
+        ),
+      );
 
   Widget _appBar(BuildContext context) {
     return SliverAppBar(
-        //floating: false,
         stretch: true,
-        onStretchTrigger: () {
-          return;
-        },
         expandedHeight:
             MediaQuery.of(context).orientation == Orientation.landscape
                 ? 80
@@ -37,11 +33,6 @@ class MainPage extends StatelessWidget {
           background: Stack(
             fit: StackFit.expand,
             children: [
-//                  Image(
-//                          image: CachedNetworkImageProvider(
-//                                  widget.trainer.image),
-//                          fit: BoxFit.cover,
-//                  ),
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -69,11 +60,13 @@ class MainPage extends StatelessWidget {
   }
 
   Widget _tabs(BuildContext context) => SliverToBoxAdapter(
-      child: Container(
+        child: Container(
           height: 640,
           color: Colors.white,
           child: TabBarView(children: <Widget>[
             OrderingPage(),
             MatchingPage(),
-          ])));
+          ]),
+        ),
+      );
 }

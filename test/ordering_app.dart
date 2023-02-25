@@ -17,9 +17,9 @@ class OrderingTestAppState extends State<OrderingTestApp> {
 }
 
 class OrderingTestPage extends StatefulWidget {
-  OrderingTestPage({Key key, this.matchingIndex}) : super(key: key);
+  OrderingTestPage({Key? key, this.matchingIndex}) : super(key: key);
 
-  final int matchingIndex;
+  final int? matchingIndex;
 
   @override
   State<OrderingTestPage> createState() {
@@ -52,7 +52,7 @@ class OrderingTestPageState extends State<OrderingTestPage> {
     );
   }
 
-  Column _buildColumn(String ct, BuildContext context, Color c1, Color c2) {
+  Column _buildColumn(String ct, BuildContext context, Color? c1, Color? c2) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[

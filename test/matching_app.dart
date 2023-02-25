@@ -19,9 +19,9 @@ class MatchingTestAppState extends State<MatchingTestApp> {
 }
 
 class MatchingTestPage extends StatefulWidget {
-  MatchingTestPage({Key key, this.matchingIndex}) : super(key: key);
+  MatchingTestPage({Key? key, this.matchingIndex}) : super(key: key);
 
-  final int matchingIndex;
+  final int? matchingIndex;
 
   @override
   State<MatchingTestPage> createState() {
@@ -59,7 +59,7 @@ class MatchingTestPageState extends State<MatchingTestPage> {
   }
 
   Column _buildColumn(GlobalKey<MatchingWidgetState> k, String ct,
-      BuildContext context, Color c1, Color c2) {
+      BuildContext context, Color? c1, Color? c2) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -87,10 +87,10 @@ class MatchingTestPageState extends State<MatchingTestPage> {
         ),
         Padding(
             padding: EdgeInsets.only(bottom: 16),
-            child: RaisedButton(
+            child: ElevatedButton(
               child: Text(ct),
               onPressed: () {
-                k.currentState.clear();
+                k.currentState?.clear();
               },
             ))
       ],

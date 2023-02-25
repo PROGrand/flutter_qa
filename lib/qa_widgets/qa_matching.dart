@@ -11,15 +11,15 @@ import 'package:rect_getter/rect_getter.dart';
 /// Parameters used to create [MatchingWidget].
 class MatchingWidgetBuilder {
   MatchingWidgetBuilder(
-      {Color activeColor,
-      Color connectedColor,
-      @required this.onClearAll,
-      @required this.onAddConnection,
-      @required this.onRemoveConnection,
-      @required this.sourcesCount,
-      @required this.destinationsCount,
-      @required this.connections,
-      @required this.build})
+      {Color? activeColor,
+      Color? connectedColor,
+      required this.onClearAll,
+      required this.onAddConnection,
+      required this.onRemoveConnection,
+      required this.sourcesCount,
+      required this.destinationsCount,
+      required this.connections,
+      required this.build})
       : this.activeColor = activeColor ?? Color.fromARGB(255, 255, 0, 0),
         this.connectedColor = connectedColor ?? Color.fromARGB(255, 0, 0, 255);
 
@@ -57,8 +57,8 @@ class MatchingWidgetBuilder {
 ///
 /// Allows to connect sources and destinations.
 class MatchingWidget extends StatefulWidget {
-  MatchingWidget({Key key, @required MatchingWidgetBuilder builder})
-      : this._builder = builder,
+  MatchingWidget({Key? key, required MatchingWidgetBuilder? builder})
+      : this._builder = builder!,
         super(key: key);
 
   /// Creates global key allowing to use of [MatchingWidget.of]
@@ -73,7 +73,7 @@ class MatchingWidget extends StatefulWidget {
   }
 
   /// Allows to get current MatchingWidget in context.
-  static MatchingWidgetState of(BuildContext context) {
+  static MatchingWidgetState? of(BuildContext context) {
     try {
       final state = context.findAncestorStateOfType<MatchingWidgetState>();
       if (state != null) return state;
@@ -84,7 +84,7 @@ class MatchingWidget extends StatefulWidget {
 }
 
 class MatchingWidgetState extends State<MatchingWidget> {
-  StreamController<_ConnectionLine> _controller;
+  StreamController<_ConnectionLine>? _controller;
 
   final _sourceRects = Map<int, Rect>();
   final _destinationRects = Map<int, Rect>();
@@ -99,7 +99,7 @@ class MatchingWidgetState extends State<MatchingWidget> {
 
   @override
   void dispose() {
-    _controller.close();
+    _controller?.close();
     super.dispose();
   }
 
@@ -114,12 +114,12 @@ class MatchingWidgetState extends State<MatchingWidget> {
               child: Stack(
                 //overflow: Overflow.clip,
                 children: <Widget>[
-                  _Boxes(controller: _controller),
+                  _Boxes(controller: _controller!),
                   SizedBox.shrink(
                       child: IgnorePointer(
                     child: _Lines(
                       key: _linesKey,
-                      stream: _controller.stream,
+                      stream: _controller!.stream,
                       activeColor: widget._builder.activeColor,
                       connectedColor: widget._builder.connectedColor,
                     ),
@@ -136,7 +136,7 @@ class MatchingWidgetState extends State<MatchingWidget> {
 
   /// Clears connections.
   void clear() {
-    _controller.add(_ConnectionLineClear());
+    _controller?.add(_ConnectionLineClear());
 
     if (null != widget._builder.onClearAll) {
       widget._builder.onClearAll();
@@ -144,7 +144,7 @@ class MatchingWidgetState extends State<MatchingWidget> {
   }
 
   void _addRect(
-      {@required bool isSource, @required int index, @required Rect rect}) {
+      {required bool isSource, required int index, required Rect rect}) {
     final rects = isSource ? _sourceRects : _destinationRects;
     rects[index] = rect;
 
@@ -155,22 +155,22 @@ class MatchingWidgetState extends State<MatchingWidget> {
   }
 
   Future<void> _initLines() async {
-    final offset = RectGetter.getRectFromKey(_rectKey).topLeft;
+    final offset = RectGetter.getRectFromKey(_rectKey)?.topLeft;
 
     final list = [
       for (final connection in widget._builder.connections.entries)
         _ConnectionLineCreated(
-            _sourceRects[connection.key].centerRight - offset,
-            _destinationRects[connection.value].centerLeft - offset,
+            _sourceRects[connection.key]!.centerRight - offset!,
+            _destinationRects[connection.value]!.centerLeft - offset!,
             connection.key)
     ];
 
-    _controller.add(_ConnectionInitLines(list));
+    _controller!.add(_ConnectionInitLines(list));
   }
 }
 
 class _Boxes extends StatefulWidget {
-  _Boxes({@required this.controller});
+  _Boxes({required this.controller});
 
   final StreamController<_ConnectionLine> controller;
 
@@ -234,10 +234,10 @@ class _BoxesState extends State<_Boxes> with TickerProviderStateMixin {
 
 class _QueryWidget extends StatefulWidget {
   _QueryWidget(
-      {Key key,
-      @required int index,
-      @required StreamController<_ConnectionLine> controller,
-      @required Widget child})
+      {Key? key,
+      required int index,
+      required StreamController<_ConnectionLine> controller,
+      required Widget child})
       : _index = index,
         _controller = controller,
         _child = child,
@@ -258,7 +258,7 @@ class _QueryWidgetState extends State<_QueryWidget> {
   final _rectKey = RectGetter.createGlobalKey();
   var _lastPosition = Offset(0, 0);
 
-  bool _inited;
+  late bool _inited;
 
   @override
   void initState() {
@@ -283,7 +283,7 @@ class _QueryWidgetState extends State<_QueryWidget> {
       if (_inited) {
         final rect = RectGetter.getRectFromKey(_rectKey);
         MatchingWidget.of(context)
-            ?._addRect(isSource: true, index: widget._index, rect: rect);
+            ?._addRect(isSource: true, index: widget._index, rect: rect!);
       }
     });
 
@@ -318,9 +318,9 @@ class _QueryWidgetState extends State<_QueryWidget> {
     final rectQuery = RectGetter.getRectFromKey(_rectKey);
 
     final rectWidget = RectGetter.getRectFromKey(matchingState._rectKey);
-    _lastPosition = position - rectWidget.topLeft;
+    _lastPosition = position - rectWidget!.topLeft;
     final line = _ConnectionLineActive(
-        rectQuery.centerRight - rectWidget.topLeft, _lastPosition);
+        rectQuery!.centerRight - rectWidget.topLeft, _lastPosition);
     widget._controller.add(line);
   }
 
@@ -333,7 +333,7 @@ class _QueryWidgetState extends State<_QueryWidget> {
     final rectWidget = RectGetter.getRectFromKey(matchingState._rectKey);
 
     final result = HitTestResult();
-    WidgetsBinding.instance.hitTest(result, _lastPosition + rectWidget.topLeft);
+    WidgetsBinding.instance.hitTest(result, _lastPosition + rectWidget!.topLeft);
 
     var found = false;
 
@@ -348,8 +348,8 @@ class _QueryWidgetState extends State<_QueryWidget> {
 
           final rectAnswer = RectGetter.getRectFromKey(metaData._rectKey);
           final line = _ConnectionLineCreated(
-              rectQuery.centerRight - rectWidget.topLeft,
-              rectAnswer.centerLeft - rectWidget.topLeft,
+              rectQuery!.centerRight - rectWidget.topLeft,
+              rectAnswer!.centerLeft - rectWidget.topLeft,
               sourceIndex);
 
           widget._controller.add(line);
@@ -379,7 +379,7 @@ typedef _AnswerWidgetBuilder = Widget Function(BuildContext context);
 
 class _AnswerWidget extends StatefulWidget {
   _AnswerWidget(
-      {Key key, @required int index, @required _AnswerWidgetBuilder builder})
+      {Key? key, required int index, required _AnswerWidgetBuilder builder})
       : _index = index,
         _builder = builder,
         super(key: key);
@@ -399,7 +399,7 @@ class _AnswerWidgetState extends State<_AnswerWidget> {
 
   final _rectKey = RectGetter.createGlobalKey();
 
-  bool _inited;
+  late bool _inited;
 
   @override
   void initState() {
@@ -427,7 +427,7 @@ class _AnswerWidgetState extends State<_AnswerWidget> {
       if (_inited) {
         final rect = RectGetter.getRectFromKey(_rectKey);
         MatchingWidget.of(context)
-            ?._addRect(isSource: false, index: widget._index, rect: rect);
+            ?._addRect(isSource: false, index: widget._index, rect: rect!);
       }
     });
 
@@ -437,10 +437,10 @@ class _AnswerWidgetState extends State<_AnswerWidget> {
 
 class _Lines extends StatefulWidget {
   _Lines(
-      {@required GlobalKey<_LinesState> key,
-      @required this.stream,
-      @required this.activeColor,
-      @required this.connectedColor})
+      {required GlobalKey<_LinesState> key,
+      required this.stream,
+      required this.activeColor,
+      required this.connectedColor})
       : super(key: key);
 
   final Stream<_ConnectionLine> stream;
@@ -500,8 +500,8 @@ class _LinesState extends State<_Lines> {
 abstract class _ConnectionLine {
   _ConnectionLine(this._start, this._end);
 
-  final Offset _start;
-  final Offset _end;
+  final Offset? _start;
+  final Offset? _end;
 
   @override
   String toString() {
@@ -572,10 +572,10 @@ class _LinesPainter extends CustomPainter {
   _LinesPainter(
       this._lines, this._activeLink, this.activeColor, this.connectedColor);
 
-  final Map<int, _ConnectionLine> _lines;
-  final _ConnectionLine _activeLink;
-  final Color activeColor;
-  final Color connectedColor;
+  final Map<int, _ConnectionLine?> _lines;
+  final _ConnectionLine? _activeLink;
+  final Color? activeColor;
+  final Color? connectedColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -584,25 +584,25 @@ class _LinesPainter extends CustomPainter {
         _activeLink,
         Paint()
           ..strokeWidth = 4
-          ..color = activeColor);
+          ..color = activeColor!);
 
-    for (_ConnectionLine line in _lines.values) {
+    for (_ConnectionLine? line in _lines.values) {
       _drawLine(
           canvas,
-          line,
+          line!,
           Paint()
             ..strokeWidth = 4
-            ..color = connectedColor);
+            ..color = connectedColor!);
     }
   }
 
-  void _drawLine(Canvas canvas, _ConnectionLine line, Paint paint) {
+  void _drawLine(Canvas canvas, _ConnectionLine? line, Paint paint) {
     if (null != line && null != line._start) {
-      canvas.drawCircle(line._start, 8, paint);
+      canvas.drawCircle(line._start!, 8, paint);
 
       if (null != line._end) {
-        canvas.drawLine(line._start, line._end, paint);
-        canvas.drawCircle(line._end, 8, paint);
+        canvas.drawLine(line._start!, line._end!, paint);
+        canvas.drawCircle(line._end!, 8, paint);
       }
     }
   }
@@ -610,7 +610,7 @@ class _LinesPainter extends CustomPainter {
   @override
   bool shouldRepaint(_LinesPainter oldDelegate) {
     final shouldRepaintMap =
-        !mapEquals<int, _ConnectionLine>(oldDelegate._lines, _lines);
+        !mapEquals<int, _ConnectionLine?>(oldDelegate._lines, _lines);
 
     final shouldRepaintActive = oldDelegate._activeLink != _activeLink;
 
@@ -620,9 +620,9 @@ class _LinesPainter extends CustomPainter {
 
 class _CustomPanGestureRecognizer extends OneSequenceGestureRecognizer {
   _CustomPanGestureRecognizer({
-    @required this.onPanDown,
-    @required this.onPanUpdate,
-    @required this.onPanEnd,
+    required this.onPanDown,
+    required this.onPanUpdate,
+    required this.onPanEnd,
   });
 
   final bool Function(Offset offset) onPanDown;
