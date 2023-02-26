@@ -24,11 +24,6 @@ final List<OrderableItem> items = <OrderableItem>[
     ..color = Colors.blue[800]!
 ];
 
-int n = 0;
-Iterable<int> order = items.map<int>((f) => n++);
-
-//////////////////////////////
-
 class OrderingPage extends StatefulWidget {
   OrderingPage({Key? key}) : super(key: key);
 
@@ -39,15 +34,20 @@ class OrderingPage extends StatefulWidget {
 }
 
 class OrderingPageState extends State<OrderingPage> {
+
+  int n = 0;
+  late Iterable<int> order;
+
   @override
   void initState() {
+    order = items.map<int>((f) => n++);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
+    return Material(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           SizedBox(
@@ -57,9 +57,9 @@ class OrderingPageState extends State<OrderingPage> {
           DragListWidget<OrderableItem>(
             builder: DragListWidgetBuilder<OrderableItem>(
               onOrder: (new_order) {
-                // setState(() {
-                //   order = new_order;
-                // });
+                setState(() {
+                  order = new_order;
+                });
               },
               ordered: order,
               items: items,

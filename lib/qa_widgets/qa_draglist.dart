@@ -42,7 +42,7 @@ class DragListWidget<T> extends StatefulWidget {
 }
 
 class _DragListWidgetState<T> extends State<DragListWidget<T>> {
-  List<int>? ordered;
+  late List<int> ordered;
 
   @override
   void initState() {

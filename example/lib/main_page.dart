@@ -12,6 +12,7 @@ class MainPage extends StatelessWidget {
         length: 2,
         child: CustomScrollView(
           slivers: <Widget>[_appBar(context), _tabs(context)],
+          physics: NeverScrollableScrollPhysics(),
         ),
       );
 
@@ -60,6 +61,7 @@ class MainPage extends StatelessWidget {
   }
 
   Widget _tabs(BuildContext context) => SliverToBoxAdapter(
+
         child: Container(
           height: 640,
           color: Colors.white,
